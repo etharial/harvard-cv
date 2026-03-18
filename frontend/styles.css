@@ -164,6 +164,49 @@ body {
   line-height: 1.55;
 }
 
+.save-files {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.save-files h3 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.save-files-row {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.save-files-row input,
+.save-files-row select {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font: inherit;
+}
+
+.save-files-actions {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.save-files-list {
+  margin-top: 7px;
+  font-size: 0.77rem;
+  color: #5a6f87;
+}
+
 .form-section {
   border-top: 1px solid var(--line);
   margin-top: 14px;
@@ -245,6 +288,16 @@ body {
   padding: 10px;
   margin-bottom: 10px;
   background: #fff;
+  cursor: grab;
+}
+
+.entry-block.dragging {
+  opacity: 0.55;
+}
+
+.entry-block.drag-over {
+  border-color: #0a4aad;
+  box-shadow: 0 0 0 2px rgba(10, 74, 173, 0.15);
 }
 
 .entry-header {
@@ -427,7 +480,6 @@ body {
   margin-top: 2px;
 }
 
-.resume-section,
 .resume-item,
 .resume-row {
   break-inside: avoid-page;
@@ -613,6 +665,11 @@ body {
   .salary-grid {
     grid-template-columns: 1fr;
   }
+
+  .save-files-row,
+  .save-files-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media print {
@@ -653,7 +710,6 @@ body {
     page-break-after: auto;
   }
 
-  .resume-section,
   .resume-item,
   .resume-row,
   .resume-list {

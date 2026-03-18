@@ -32,6 +32,8 @@
 				<button id="downloadBtn" class="btn btn-primary" type="button" data-i18n="actions.download"></button>
 			</div>
 
+			<div class="save-files" id="saveFilesPanel"></div>
+
 			<div class="privacy-box">
 				<h3 data-i18n="privacy.title"></h3>
 				<ul>

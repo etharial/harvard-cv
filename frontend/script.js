@@ -10,6 +10,21 @@ const translations = {
     "actions.save": "Save",
     "actions.clear": "Clear",
     "actions.download": "Download PDF",
+    "saveFiles.title": "Save Files",
+    "saveFiles.slotName": "Slot name",
+    "saveFiles.select": "Select a saved slot",
+    "saveFiles.save": "Save Slot",
+    "saveFiles.load": "Load Slot",
+    "saveFiles.delete": "Delete Slot",
+    "saveFiles.empty": "No save files yet.",
+    "saveFiles.savedAt": "Saved",
+    "saveFiles.slotPlaceholder": "My Resume Slot",
+    "saveFiles.confirmLoad":
+      "Load selected save file? Unsaved edits will be replaced.",
+    "saveFiles.confirmDelete": "Delete selected save file?",
+    "saveFiles.saved": "Save file updated.",
+    "saveFiles.loaded": "Save file loaded.",
+    "saveFiles.deleted": "Save file deleted.",
     "privacy.title": "Privacy First",
     "privacy.localOnly":
       "Resume data stays in your browser. Personal profile can sync to your own MySQL.",
@@ -88,9 +103,14 @@ const translations = {
     "labels.date": "Date",
     "labels.organizer": "Organizer",
     "labels.skills": "Core Skills (comma-separated)",
+    "labels.aiWorkflowTitle": "Workflow Title",
+    "labels.aiWorkflowBullets": "Bullet Points (one point per line)",
     "labels.languages": "Languages",
     "labels.certifications": "Certifications",
     "labels.interests": "Interests",
+    "skills.aiWorkflowHeading": "Artificial Intelligence Workflow",
+    "skills.aiWorkflowAdd": "Add AI Workflow",
+    "skills.aiWorkflowEntry": "AI Workflow Entry",
     "tools.ats.heading": "ATS Meter Checker",
     "tools.ats.desc":
       "Score your resume structure and keyword readiness before sending applications.",
@@ -143,6 +163,9 @@ const translations = {
     "ph.date": "Mar 2026",
     "ph.organizer": "Tech Community",
     "ph.skills": "Project management, SQL, Stakeholder communication",
+    "ph.aiWorkflowTitle": "AI Resume Tailoring Workflow",
+    "ph.aiWorkflowBullets":
+      "Analyze job description requirements\nMap skills and achievements\nGenerate tailored resume bullet points",
     "ph.languages": "English (Fluent), Spanish (Conversational)",
     "ph.certifications": "Google Data Analytics Certificate",
     "ph.interests": "Community mentoring, AI for social impact",
@@ -156,6 +179,21 @@ const translations = {
     "actions.save": "Guardar",
     "actions.clear": "Limpiar",
     "actions.download": "Descargar PDF",
+    "saveFiles.title": "Archivos Guardados",
+    "saveFiles.slotName": "Nombre del archivo",
+    "saveFiles.select": "Selecciona un archivo guardado",
+    "saveFiles.save": "Guardar Archivo",
+    "saveFiles.load": "Cargar Archivo",
+    "saveFiles.delete": "Eliminar Archivo",
+    "saveFiles.empty": "No hay archivos guardados.",
+    "saveFiles.savedAt": "Guardado",
+    "saveFiles.slotPlaceholder": "Mi CV Slot",
+    "saveFiles.confirmLoad":
+      "Cargar archivo seleccionado? Los cambios sin guardar se reemplazaran.",
+    "saveFiles.confirmDelete": "Eliminar archivo guardado seleccionado?",
+    "saveFiles.saved": "Archivo guardado actualizado.",
+    "saveFiles.loaded": "Archivo guardado cargado.",
+    "saveFiles.deleted": "Archivo guardado eliminado.",
     "privacy.title": "Privacidad Primero",
     "privacy.localOnly":
       "Los datos se guardan en tu navegador. El perfil personal puede sincronizarse con tu MySQL.",
@@ -292,6 +330,50 @@ const translations = {
     "ph.certifications": "Certificado en Analitica de Datos de Google",
     "ph.interests": "Mentoria comunitaria, IA para impacto social",
   },
+  tl: {
+    "hero.subtitle":
+      "Gumawa ng Harvard-style resume na ATS-ready sa loob ng ilang minuto.",
+    "form.title": "Resume Builder",
+    "form.description": "Gamitin ang tabs para punan ang bawat seksyon.",
+    "actions.save": "I-save",
+    "actions.clear": "I-clear",
+    "actions.download": "I-download PDF",
+    "saveFiles.title": "Save Files",
+    "saveFiles.slotName": "Pangalan ng slot",
+    "saveFiles.select": "Pumili ng saved slot",
+    "saveFiles.save": "Save Slot",
+    "saveFiles.load": "Load Slot",
+    "saveFiles.delete": "Delete Slot",
+    "saveFiles.empty": "Wala pang save file.",
+    "saveFiles.savedAt": "Na-save",
+    "saveFiles.slotPlaceholder": "Resume Slot",
+    "saveFiles.confirmLoad":
+      "I-load ang napiling save file? Mapapalitan ang unsaved changes.",
+    "saveFiles.confirmDelete": "Burahin ang napiling save file?",
+    "saveFiles.saved": "Na-update ang save file.",
+    "saveFiles.loaded": "Na-load ang save file.",
+    "saveFiles.deleted": "Nabura ang save file.",
+    "privacy.title": "Privacy Muna",
+    "privacy.localOnly":
+      "Nasa browser mo lang ang data; puwedeng mag-sync sa sarili mong MySQL.",
+    "privacy.noAccount": "Walang sign up at walang registration.",
+    "privacy.editAnytime": "Madaling i-edit para sa iba-ibang trabaho.",
+    "preview.title": "Live Preview",
+    "preview.description": "Harvard-style at ATS-compatible na format.",
+    "section.personal": "Personal",
+    "section.education": "Edukasyon",
+    "section.experience": "Karanasan",
+    "section.leadership": "Pamumuno at Aktibidad",
+    "section.projects": "Mga Proyekto",
+    "section.skills": "Skills",
+    "section.courses": "Mga Kurso at Sertipikasyon",
+    "section.trainings": "Trainings at Seminar",
+    "section.honors": "Parangal at Achievement",
+    "tools.title": "Career Tools",
+    "tools.ats": "ATS Meter",
+    "tools.jobMatch": "Job Match Analyzer",
+    "tools.salary": "Salary Transparency",
+  },
 };
 
 const defaultState = {
@@ -316,9 +398,12 @@ const defaultState = {
   courses: [emptyCourse()],
   trainings: [emptyTraining()],
   skills: "",
+  aiWorkflow: [emptyAiWorkflow()],
   languages: "",
   certifications: "",
   interests: "",
+  saveSlots: {},
+  selectedSaveSlot: "",
   jobDescription: "",
   salaryRecords: [],
 };
@@ -329,6 +414,7 @@ const languageToggle = document.getElementById("languageToggle");
 const saveBtn = document.getElementById("saveBtn");
 const clearBtn = document.getElementById("clearBtn");
 const downloadBtn = document.getElementById("downloadBtn");
+const saveFilesPanel = document.getElementById("saveFilesPanel");
 
 const personalSection = document.getElementById("personalSection");
 const educationSection = document.getElementById("educationSection");
@@ -357,7 +443,9 @@ async function boot() {
 
 function bindUIActions() {
   languageToggle.addEventListener("click", () => {
-    state.language = state.language === "en" ? "es" : "en";
+    const order = ["en", "es", "tl"];
+    const idx = order.indexOf(state.language);
+    state.language = order[(idx + 1) % order.length];
     persistState(false);
     applyStaticTranslations();
     renderAll();
@@ -475,6 +563,7 @@ function applyToolTabState() {
 }
 
 function renderAll() {
+  renderSaveFilesPanel();
   renderPersonalSection();
   renderDynamicSection("education", educationSection, [
     { key: "school", type: "text" },
@@ -534,6 +623,153 @@ function renderAll() {
   renderPreview();
   applySectionTabState();
   applyToolTabState();
+}
+
+function renderSaveFilesPanel() {
+  if (!saveFilesPanel) {
+    return;
+  }
+
+  const slotKeys = Object.keys(state.saveSlots || {}).sort((a, b) =>
+    a.localeCompare(b),
+  );
+
+  saveFilesPanel.innerHTML = `
+    <h3>${t("saveFiles.title")}</h3>
+    <div class="save-files-row">
+      <input id="saveSlotNameInput" type="text" placeholder="${t("saveFiles.slotPlaceholder")}">
+      <select id="saveSlotSelect">
+        <option value="">${t("saveFiles.select")}</option>
+        ${slotKeys
+          .map(
+            (key) =>
+              `<option value="${esc(key)}" ${state.selectedSaveSlot === key ? "selected" : ""}>${esc(key)}</option>`,
+          )
+          .join("")}
+      </select>
+    </div>
+    <div class="save-files-actions">
+      <button id="saveSlotBtn" class="btn btn-secondary" type="button">${t("saveFiles.save")}</button>
+      <button id="loadSlotBtn" class="btn btn-ghost" type="button">${t("saveFiles.load")}</button>
+      <button id="deleteSlotBtn" class="btn btn-ghost" type="button">${t("saveFiles.delete")}</button>
+    </div>
+    <div class="save-files-list">${renderSaveSlotSummary(slotKeys)}</div>
+  `;
+
+  const slotNameInput = document.getElementById("saveSlotNameInput");
+  const slotSelect = document.getElementById("saveSlotSelect");
+
+  slotNameInput.value = state.selectedSaveSlot || "";
+
+  slotSelect.addEventListener("change", (event) => {
+    state.selectedSaveSlot = clean(event.target.value);
+    persistState(false);
+    renderSaveFilesPanel();
+  });
+
+  document.getElementById("saveSlotBtn").addEventListener("click", () => {
+    const slotName = clean(slotNameInput.value || state.selectedSaveSlot);
+    if (!slotName) {
+      window.alert(t("saveFiles.slotName"));
+      return;
+    }
+
+    state.saveSlots[slotName] = {
+      savedAt: new Date().toISOString(),
+      state: buildSaveSnapshot(),
+    };
+    state.selectedSaveSlot = slotName;
+    persistState(false);
+    renderSaveFilesPanel();
+    window.alert(t("saveFiles.saved"));
+  });
+
+  document.getElementById("loadSlotBtn").addEventListener("click", () => {
+    const slotName = clean(slotSelect.value || state.selectedSaveSlot);
+    if (!slotName || !state.saveSlots[slotName]) {
+      return;
+    }
+
+    if (!window.confirm(t("saveFiles.confirmLoad"))) {
+      return;
+    }
+
+    const snapshot = state.saveSlots[slotName].state;
+    applySnapshotToState(snapshot);
+    state.selectedSaveSlot = slotName;
+    persistState(false);
+    applyStaticTranslations();
+    renderAll();
+    window.alert(t("saveFiles.loaded"));
+  });
+
+  document.getElementById("deleteSlotBtn").addEventListener("click", () => {
+    const slotName = clean(slotSelect.value || state.selectedSaveSlot);
+    if (!slotName || !state.saveSlots[slotName]) {
+      return;
+    }
+
+    if (!window.confirm(t("saveFiles.confirmDelete"))) {
+      return;
+    }
+
+    delete state.saveSlots[slotName];
+    if (state.selectedSaveSlot === slotName) {
+      state.selectedSaveSlot = "";
+    }
+    persistState(false);
+    renderSaveFilesPanel();
+    window.alert(t("saveFiles.deleted"));
+  });
+}
+
+function renderSaveSlotSummary(slotKeys) {
+  if (!slotKeys.length) {
+    return t("saveFiles.empty");
+  }
+
+  return slotKeys
+    .slice(0, 4)
+    .map((key) => {
+      const savedAt = state.saveSlots[key]?.savedAt;
+      const dateLabel = savedAt ? new Date(savedAt).toLocaleString() : "";
+      return `${esc(key)} - ${t("saveFiles.savedAt")}: ${esc(dateLabel)}`;
+    })
+    .join("<br>");
+}
+
+function buildSaveSnapshot() {
+  const snapshot = getSanitizedStateForSave();
+  return {
+    ...snapshot,
+    saveSlots: {},
+    selectedSaveSlot: "",
+  };
+}
+
+function applySnapshotToState(snapshot) {
+  const currentSlots = state.saveSlots || {};
+
+  state = {
+    ...structuredClone(defaultState),
+    ...snapshot,
+    personal: {
+      ...structuredClone(defaultState.personal),
+      ...(snapshot.personal || {}),
+    },
+    education: sanitizeArray(snapshot.education, emptyEducation),
+    experience: sanitizeArray(snapshot.experience, emptyExperience),
+    projects: sanitizeArray(snapshot.projects, emptyProject),
+    leadership: sanitizeArray(snapshot.leadership, emptyLeadership),
+    honors: sanitizeArray(snapshot.honors, emptyHonor),
+    courses: sanitizeArray(snapshot.courses, emptyCourse),
+    trainings: sanitizeArray(snapshot.trainings, emptyTraining),
+    aiWorkflow: sanitizeArray(snapshot.aiWorkflow, emptyAiWorkflow),
+    salaryRecords: Array.isArray(snapshot.salaryRecords)
+      ? snapshot.salaryRecords
+      : [],
+    saveSlots: currentSlots,
+  };
 }
 
 function renderPersonalSection() {
@@ -598,9 +834,13 @@ function renderDynamicSection(sectionKey, container, schema) {
     renderAll();
   });
 
+  let draggedIndex = null;
+
   state[sectionKey].forEach((entry, index) => {
     const block = document.createElement("div");
     block.className = "entry-block";
+    block.draggable = true;
+    block.dataset.index = String(index);
     block.innerHTML = `
       <div class="entry-header">
         <span class="entry-title">${t(`entry.${sectionKey}`)} ${index + 1}</span>
@@ -616,6 +856,47 @@ function renderDynamicSection(sectionKey, container, schema) {
       if (!state[sectionKey].length) {
         state[sectionKey].push(createEntryBySection(sectionKey));
       }
+      persistState(false);
+      renderAll();
+    });
+
+    block.addEventListener("dragstart", () => {
+      draggedIndex = index;
+      block.classList.add("dragging");
+    });
+
+    block.addEventListener("dragend", () => {
+      draggedIndex = null;
+      block.classList.remove("dragging");
+      container
+        .querySelectorAll(".entry-block")
+        .forEach((node) => node.classList.remove("drag-over"));
+    });
+
+    block.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      block.classList.add("drag-over");
+    });
+
+    block.addEventListener("dragleave", () => {
+      block.classList.remove("drag-over");
+    });
+
+    block.addEventListener("drop", (event) => {
+      event.preventDefault();
+      block.classList.remove("drag-over");
+
+      const dropIndex = Number(block.dataset.index);
+      if (
+        draggedIndex === null ||
+        Number.isNaN(dropIndex) ||
+        draggedIndex === dropIndex
+      ) {
+        return;
+      }
+
+      const moved = state[sectionKey].splice(draggedIndex, 1)[0];
+      state[sectionKey].splice(dropIndex, 0, moved);
       persistState(false);
       renderAll();
     });
@@ -665,23 +946,24 @@ function renderSkillsSection() {
       <input id="languagesInput" type="text" placeholder="${t("ph.languages")}">
     </div>
     <div class="input-wrap">
-      <label for="certificationsInput">${t("labels.certifications")}</label>
-      <input id="certificationsInput" type="text" placeholder="${t("ph.certifications")}">
-    </div>
-    <div class="input-wrap">
       <label for="interestsInput">${t("labels.interests")}</label>
       <input id="interestsInput" type="text" placeholder="${t("ph.interests")}">
     </div>
+    <div class="section-head">
+      <h3>${t("skills.aiWorkflowHeading")}</h3>
+      <button id="addAiWorkflowBtn" class="add-btn" type="button">${t("skills.aiWorkflowAdd")}</button>
+    </div>
+    <div id="aiWorkflowEntries" class="entries"></div>
   `;
 
   const skillsInput = document.getElementById("skillsInput");
   const languagesInput = document.getElementById("languagesInput");
-  const certificationsInput = document.getElementById("certificationsInput");
   const interestsInput = document.getElementById("interestsInput");
+  const addAiWorkflowBtn = document.getElementById("addAiWorkflowBtn");
+  const aiWorkflowEntries = document.getElementById("aiWorkflowEntries");
 
   skillsInput.value = state.skills;
   languagesInput.value = state.languages;
-  certificationsInput.value = state.certifications;
   interestsInput.value = state.interests;
 
   skillsInput.addEventListener("input", (e) =>
@@ -690,12 +972,101 @@ function renderSkillsSection() {
   languagesInput.addEventListener("input", (e) =>
     updateSimpleField("languages", e.target.value),
   );
-  certificationsInput.addEventListener("input", (e) =>
-    updateSimpleField("certifications", e.target.value),
-  );
   interestsInput.addEventListener("input", (e) =>
     updateSimpleField("interests", e.target.value),
   );
+
+  addAiWorkflowBtn.addEventListener("click", () => {
+    state.aiWorkflow.push(emptyAiWorkflow());
+    persistState(false);
+    renderAll();
+  });
+
+  let draggedIndex = null;
+  state.aiWorkflow.forEach((entry, index) => {
+    const block = document.createElement("div");
+    block.className = "entry-block";
+    block.draggable = true;
+    block.dataset.index = String(index);
+    block.innerHTML = `
+      <div class="entry-head">
+        <h4>${t("skills.aiWorkflowEntry")} ${index + 1}</h4>
+        <button class="remove-btn" type="button">${t("remove")}</button>
+      </div>
+      <div class="grid-two">
+        <div class="input-wrap">
+          <label for="aiWorkflow-${index}-title">${t("labels.aiWorkflowTitle")}</label>
+          <input id="aiWorkflow-${index}-title" type="text" placeholder="${t("ph.aiWorkflowTitle")}">
+        </div>
+        <div class="input-wrap" style="grid-column: 1 / -1;">
+          <label for="aiWorkflow-${index}-details">${t("labels.aiWorkflowBullets")}</label>
+          <textarea id="aiWorkflow-${index}-details" placeholder="${t("ph.aiWorkflowBullets")}"></textarea>
+        </div>
+      </div>
+    `;
+
+    block.querySelector(".remove-btn").addEventListener("click", () => {
+      state.aiWorkflow.splice(index, 1);
+      if (!state.aiWorkflow.length) {
+        state.aiWorkflow.push(emptyAiWorkflow());
+      }
+      persistState(false);
+      renderAll();
+    });
+
+    const titleInput = block.querySelector(`#aiWorkflow-${index}-title`);
+    const detailsInput = block.querySelector(`#aiWorkflow-${index}-details`);
+
+    titleInput.value = entry.title || "";
+    detailsInput.value = entry.details || "";
+
+    titleInput.addEventListener("input", (event) => {
+      state.aiWorkflow[index].title = event.target.value;
+      debouncedSave();
+      renderPreview();
+    });
+
+    detailsInput.addEventListener("input", (event) => {
+      state.aiWorkflow[index].details = event.target.value;
+      debouncedSave();
+      renderPreview();
+    });
+
+    block.addEventListener("dragstart", () => {
+      draggedIndex = index;
+      block.classList.add("dragging");
+    });
+
+    block.addEventListener("dragend", () => {
+      draggedIndex = null;
+      block.classList.remove("dragging");
+    });
+
+    block.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      block.classList.add("drag-over");
+    });
+
+    block.addEventListener("dragleave", () => {
+      block.classList.remove("drag-over");
+    });
+
+    block.addEventListener("drop", () => {
+      block.classList.remove("drag-over");
+      if (draggedIndex === null || draggedIndex === index) {
+        return;
+      }
+
+      const items = [...state.aiWorkflow];
+      const [moved] = items.splice(draggedIndex, 1);
+      items.splice(index, 0, moved);
+      state.aiWorkflow = items;
+      persistState(false);
+      renderAll();
+    });
+
+    aiWorkflowEntries.appendChild(block);
+  });
 }
 
 function renderAtsPanel() {
@@ -896,7 +1267,7 @@ function runAtsScan(customText) {
     hasEntries(state.projects, ["projectName", "details"]),
     hasEntries(state.leadership, ["organization", "role", "details"]),
     hasEntries(state.honors, ["title", "issuer", "date"]),
-    clean(state.skills),
+    clean(state.skills) || hasEntries(state.aiWorkflow, ["title", "details"]),
   ].filter(Boolean).length;
   const sectionScore = Math.round((presentSections / 7) * 30);
 
@@ -1026,7 +1397,8 @@ function renderPreview() {
     hasEntries(state.honors, ["title", "issuer", "date"]) ||
     hasEntries(state.courses, ["title", "issuer", "date"]) ||
     hasEntries(state.trainings, ["title", "organizer", "date"]) ||
-    !!clean(state.skills);
+    !!clean(state.skills) ||
+    hasEntries(state.aiWorkflow, ["title", "details"]);
 
   if (!hasMainContent) {
     preview.innerHTML = `<p class="empty-state">${t("empty.preview")}</p>`;
@@ -1066,15 +1438,6 @@ function renderPreview() {
       date: formatDateRange(item.start, item.end),
       details: item.details,
     }))}
-    ${renderEntryPreview("projects", "preview.projects", (item) => ({
-      title: item.projectName,
-      subtitle: [item.projectRole, item.tech, item.link]
-        .map(clean)
-        .filter(Boolean)
-        .join(" | "),
-      date: formatDateRange(item.start, item.end),
-      details: item.details,
-    }))}
     ${renderEntryPreview("leadership", "preview.leadership", (item) => ({
       title: item.organization,
       subtitle: [item.role, item.location]
@@ -1084,10 +1447,16 @@ function renderPreview() {
       date: formatDateRange(item.start, item.end),
       details: item.details,
     }))}
+    ${renderEntryPreview("projects", "preview.projects", (item) => ({
+      title: item.projectName,
+      subtitleHtml: formatProjectSubtitle(item),
+      date: formatDateRange(item.start, item.end),
+      details: item.details,
+    }))}
     ${renderSkillsPreview()}
     ${renderDateRowSection("courses", "preview.courses", "issuer")}
     ${renderDateRowSection("trainings", "preview.trainings", "organizer")}
-    ${renderDateRowSection("honors", "preview.honors", "issuer")}
+    ${renderHonorsSection()}
   `;
 }
 
@@ -1122,14 +1491,19 @@ function renderEntryPreview(sectionKey, headingKey, mapFn) {
 function renderSkillsPreview() {
   const technicalLines = parseSkillLines(state.skills);
   const languageLines = splitByCommaOrNewline(state.languages);
-  const certLines = splitByCommaOrNewline(state.certifications);
   const interestLines = splitByCommaOrNewline(state.interests);
+  const aiWorkflowItems = state.aiWorkflow
+    .map((item) => ({
+      title: clean(item.title),
+      bullets: splitByNewline(item.details),
+    }))
+    .filter((item) => item.title || item.bullets.length);
 
   if (
     !technicalLines.length &&
     !languageLines.length &&
-    !certLines.length &&
-    !interestLines.length
+    !interestLines.length &&
+    !aiWorkflowItems.length
   ) {
     return "";
   }
@@ -1149,17 +1523,26 @@ function renderSkillsPreview() {
     `);
   }
 
-  if (certLines.length) {
-    blocks.push(`
-      <h4 class="resume-subheading">${t("preview.certifications")}</h4>
-      <ul class="resume-list">${certLines.map((line) => `<li>${esc(line)}</li>`).join("")}</ul>
-    `);
-  }
-
   if (interestLines.length) {
     blocks.push(`
       <h4 class="resume-subheading">${t("preview.interests")}</h4>
       <ul class="resume-list">${interestLines.map((line) => `<li>${esc(line)}</li>`).join("")}</ul>
+    `);
+  }
+
+  if (aiWorkflowItems.length) {
+    blocks.push(`
+      <h4 class="resume-subheading">${t("skills.aiWorkflowHeading")}</h4>
+      ${aiWorkflowItems
+        .map(
+          (item) => `
+            <article class="resume-item resume-item-inline">
+              ${item.title ? `<div class="resume-item-title">${esc(item.title)}</div>` : ""}
+              ${item.bullets.length ? `<ul class="resume-list">${item.bullets.map((line) => `<li>${esc(line)}</li>`).join("")}</ul>` : ""}
+            </article>
+          `,
+        )
+        .join("")}
     `);
   }
 
@@ -1187,7 +1570,13 @@ function renderDateRowSection(sectionKey, headingKey, sourceKey) {
         .map(clean)
         .filter(Boolean);
 
-      const mainText = [titleText, sourceText].filter(Boolean).join(" - ");
+      const titleWithQuotes =
+        sectionKey === "courses" || sectionKey === "trainings"
+          ? quoteTitle(titleText)
+          : titleText;
+      const mainText = [titleWithQuotes, sourceText]
+        .filter(Boolean)
+        .join(" - ");
       const detailsText = detailLines.length
         ? `<div>${detailLines.map((line) => esc(line)).join(" | ")}</div>`
         : "";
@@ -1213,6 +1602,56 @@ function renderDateRowSection(sectionKey, headingKey, sourceKey) {
   `;
 }
 
+function renderHonorsSection() {
+  const items = state.honors.filter((item) =>
+    Object.values(item).some((value) => clean(value)),
+  );
+
+  if (!items.length) {
+    return "";
+  }
+
+  return `
+    <section class="resume-section">
+      <h3>${t("preview.honors")}</h3>
+      ${items
+        .map((item) => {
+          const title = clean(item.title);
+          const source = [clean(item.issuer), clean(item.date)]
+            .filter(Boolean)
+            .join(" - ");
+          const details = clean(item.details)
+            .split("\n")
+            .map(clean)
+            .filter(Boolean);
+
+          return `
+            <article class="resume-item">
+              <div class="resume-item-body">
+                ${title ? `<strong>${esc(title)}</strong>` : ""}${source ? ` - ${esc(source)}` : ""}
+              </div>
+              ${details.length ? `<ul class="resume-list">${details.map((line) => `<li>${esc(line)}</li>`).join("")}</ul>` : ""}
+            </article>
+          `;
+        })
+        .join("")}
+    </section>
+  `;
+}
+
+function quoteTitle(value) {
+  const title = clean(value);
+  if (!title) {
+    return "";
+  }
+
+  if (/^["'\u201c\u201d].*["'\u201c\u201d]$/.test(title)) {
+    return title;
+  }
+
+  return `"${title}"`;
+}
+
 function parseSkillLines(value) {
   const raw = clean(value);
   if (!raw) {
@@ -1226,24 +1665,46 @@ function parseSkillLines(value) {
   return raw.split(",").map(clean).filter(Boolean);
 }
 
+function splitByNewline(value) {
+  return clean(value)
+    .split("\n")
+    .map((line) => clean(line.replace(/^[-*•]\s*/, "")))
+    .filter(Boolean);
+}
+
 function splitByCommaOrNewline(value) {
   return clean(value).split(/\n|,/).map(clean).filter(Boolean);
 }
 
-function renderResumeItem({ title, subtitle, date, details }) {
+function renderResumeItem({ title, subtitle, subtitleHtml, date, details }) {
   const lines = clean(details).split("\n").map(clean).filter(Boolean);
+  const safeSubtitleHtml = clean(subtitleHtml);
+  const subtitleBlock = safeSubtitleHtml
+    ? `<div class="resume-item-sub">${safeSubtitleHtml}</div>`
+    : clean(subtitle)
+      ? `<div class="resume-item-sub">${esc(clean(subtitle))}</div>`
+      : "";
+
   return `
     <article class="resume-item">
       <div class="resume-item-top">
         <div>
           ${clean(title) ? `<div class="resume-item-title">${esc(clean(title))}</div>` : ""}
-          ${clean(subtitle) ? `<div class="resume-item-sub">${esc(clean(subtitle))}</div>` : ""}
+          ${subtitleBlock}
         </div>
         ${clean(date) ? `<div class="resume-item-date">${esc(clean(date))}</div>` : ""}
       </div>
       ${lines.length ? `<ul class="resume-list">${lines.map((line) => `<li>${esc(line)}</li>`).join("")}</ul>` : ""}
     </article>
   `;
+}
+
+function formatProjectSubtitle(item) {
+  const parts = [item.projectRole, item.tech, item.link]
+    .map(clean)
+    .filter(Boolean);
+
+  return parts.map((part) => `<em>${esc(part)}</em>`).join(" | ");
 }
 
 function createEntryBySection(sectionKey) {
@@ -1314,6 +1775,10 @@ function emptyTraining() {
   return { title: "", organizer: "", date: "", details: "" };
 }
 
+function emptyAiWorkflow() {
+  return { title: "", details: "" };
+}
+
 function updateSimpleField(key, value) {
   state[key] = value;
   debouncedSave();
@@ -1329,6 +1794,7 @@ function countBulletLines() {
     state.honors,
     state.courses,
     state.trainings,
+    state.aiWorkflow,
   ].forEach((collection) => {
     collection.forEach((entry) => fields.push(entry.details || ""));
   });
@@ -1351,6 +1817,11 @@ function getResumePlainText() {
     state.certifications,
     state.interests,
   ];
+
+  state.aiWorkflow.forEach((entry) => {
+    chunks.push(entry.title || "");
+    chunks.push(entry.details || "");
+  });
 
   [
     state.education,
@@ -1436,7 +1907,9 @@ function applyStaticTranslations() {
   document.title =
     state.language === "en"
       ? "Harvard Resume Builder"
-      : "Generador de CV Harvard";
+      : state.language === "es"
+        ? "Generador de CV Harvard"
+        : "Tagabuo ng Harvard Resume";
   languageToggle.textContent = state.language.toUpperCase();
   document.documentElement.lang = state.language;
 }
@@ -1463,6 +1936,12 @@ function loadState() {
       honors: sanitizeArray(parsed.honors, emptyHonor),
       courses: sanitizeArray(parsed.courses, emptyCourse),
       trainings: sanitizeArray(parsed.trainings, emptyTraining),
+      aiWorkflow: sanitizeArray(parsed.aiWorkflow, emptyAiWorkflow),
+      saveSlots:
+        parsed.saveSlots && typeof parsed.saveSlots === "object"
+          ? parsed.saveSlots
+          : {},
+      selectedSaveSlot: clean(parsed.selectedSaveSlot || ""),
       salaryRecords: Array.isArray(parsed.salaryRecords)
         ? parsed.salaryRecords
         : [],
@@ -1490,6 +1969,11 @@ function getSanitizedStateForSave() {
   return {
     ...state,
     personal: getSanitizedPersonalForSave(),
+    saveSlots:
+      state.saveSlots && typeof state.saveSlots === "object"
+        ? state.saveSlots
+        : {},
+    selectedSaveSlot: clean(state.selectedSaveSlot || ""),
   };
 }
 
@@ -1559,6 +2043,7 @@ async function hydrateResumeFromDatabase() {
       honors: sanitizeArray(remoteState.honors, emptyHonor),
       courses: sanitizeArray(remoteState.courses, emptyCourse),
       trainings: sanitizeArray(remoteState.trainings, emptyTraining),
+      aiWorkflow: sanitizeArray(remoteState.aiWorkflow, emptyAiWorkflow),
       salaryRecords: Array.isArray(remoteState.salaryRecords)
         ? remoteState.salaryRecords
         : [],
