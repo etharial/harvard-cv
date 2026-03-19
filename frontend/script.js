@@ -706,10 +706,7 @@ function renderSaveFilesPanel() {
     }
 
     const snapshot = state.saveSlots[slotName].state;
-    console.log("Loading slot:", slotName);
-    console.log("Snapshot before apply:", snapshot);
     applySnapshotToState(snapshot);
-    console.log("State after apply:", state.personal);
     state.selectedSaveSlot = slotName;
     persistState(false);
     applyStaticTranslations();
@@ -822,9 +819,7 @@ function renderPersonalSection() {
     `;
 
     const control = wrap.querySelector(isSummary ? "textarea" : "input");
-    const fieldValue = state.personal[field] || "";
-    console.log(`Setting personal.${field} to:`, fieldValue);
-    control.value = fieldValue;
+    control.value = state.personal[field] || "";
     control.addEventListener("input", (event) => {
       state.personal[field] = event.target.value;
       debouncedSave();

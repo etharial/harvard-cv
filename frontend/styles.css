@@ -802,6 +802,12 @@ body.dark-mode .resume-preview {
     background: #fff;
   }
 
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+  }
+
   .topbar,
   .form-panel,
   .preview-head {
@@ -816,6 +822,7 @@ body.dark-mode .resume-preview {
   }
 
   .preview-panel {
+    background: transparent !important;
     border: 0;
     box-shadow: none;
     padding: 0;
@@ -824,6 +831,7 @@ body.dark-mode .resume-preview {
   }
 
   .resume-preview {
+    background: #fff !important;
     margin: 0;
     width: auto;
     min-height: auto;
