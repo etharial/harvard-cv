@@ -480,6 +480,7 @@ function bindUIActions() {
     if (!ok) {
       return;
     }
+    const currentSlots = state.saveSlots || {};
     state = structuredClone(defaultState);
     state.education = [emptyEducation()];
     state.experience = [emptyExperience()];
@@ -488,6 +489,7 @@ function bindUIActions() {
     state.honors = [emptyHonor()];
     state.courses = [emptyCourse()];
     state.trainings = [emptyTraining()];
+    state.saveSlots = currentSlots;
     persistState(false);
     renderAll();
   });
@@ -704,7 +706,10 @@ function renderSaveFilesPanel() {
     }
 
     const snapshot = state.saveSlots[slotName].state;
+    console.log("Loading slot:", slotName);
+    console.log("Snapshot before apply:", snapshot);
     applySnapshotToState(snapshot);
+    console.log("State after apply:", state.personal);
     state.selectedSaveSlot = slotName;
     persistState(false);
     applyStaticTranslations();
@@ -817,7 +822,9 @@ function renderPersonalSection() {
     `;
 
     const control = wrap.querySelector(isSummary ? "textarea" : "input");
-    control.value = state.personal[field] || "";
+    const fieldValue = state.personal[field] || "";
+    console.log(`Setting personal.${field} to:`, fieldValue);
+    control.value = fieldValue;
     control.addEventListener("input", (event) => {
       state.personal[field] = event.target.value;
       debouncedSave();
@@ -2048,9 +2055,7 @@ async function syncResumeToDatabase() {
 }
 
 async function hydrateResumeFromDatabase() {
-  if (localStorage.getItem(STORAGE_KEY)) {
-    return;
-  }
+  const hasLocalStorage = !!localStorage.getItem(STORAGE_KEY);
 
   try {
     const response = await fetch("../backend/load_resume.php", {
@@ -2064,6 +2069,16 @@ async function hydrateResumeFromDatabase() {
     }
 
     const remoteState = payload.state;
+
+    // If we have localStorage, merge only saveSlots and selectedSaveSlot from db
+    if (hasLocalStorage) {
+      state.saveSlots = remoteState.saveSlots || {};
+      state.selectedSaveSlot = clean(remoteState.selectedSaveSlot || "");
+      persistState(false);
+      return;
+    }
+
+    // If no localStorage, load entire state from database
     state = {
       ...structuredClone(defaultState),
       ...remoteState,
@@ -2079,6 +2094,8 @@ async function hydrateResumeFromDatabase() {
       courses: sanitizeArray(remoteState.courses, emptyCourse),
       trainings: sanitizeArray(remoteState.trainings, emptyTraining),
       aiWorkflow: sanitizeArray(remoteState.aiWorkflow, emptyAiWorkflow),
+      saveSlots: remoteState.saveSlots || {},
+      selectedSaveSlot: clean(remoteState.selectedSaveSlot || ""),
       salaryRecords: Array.isArray(remoteState.salaryRecords)
         ? remoteState.salaryRecords
         : [],
