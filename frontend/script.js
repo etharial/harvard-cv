@@ -104,7 +104,7 @@ const translations = {
     "labels.issuer": "Issuer",
     "labels.date": "Date",
     "labels.organizer": "Organizer",
-    "labels.skills": "Core Skills (comma-separated)",
+    "labels.skills": "Core Skills (one point per line)",
     "labels.aiWorkflowTitle": "Workflow Title",
     "labels.aiWorkflowBullets": "Bullet Points (one point per line)",
     "labels.languages": "Languages",
@@ -275,7 +275,7 @@ const translations = {
     "labels.issuer": "Institucion",
     "labels.date": "Fecha",
     "labels.organizer": "Organizador",
-    "labels.skills": "Habilidades clave (separadas por comas)",
+    "labels.skills": "Habilidades clave (un punto por linea)",
     "labels.languages": "Idiomas",
     "labels.certifications": "Certificaciones",
     "labels.interests": "Intereses",
@@ -1669,11 +1669,7 @@ function parseSkillLines(value) {
     return [];
   }
 
-  if (raw.includes("\n")) {
-    return raw.split("\n").map(clean).filter(Boolean);
-  }
-
-  return raw.split(",").map(clean).filter(Boolean);
+  return raw.split("\n").map(clean).filter(Boolean);
 }
 
 function splitByNewline(value) {
@@ -1684,7 +1680,7 @@ function splitByNewline(value) {
 }
 
 function splitByCommaOrNewline(value) {
-  return clean(value).split(/\n|,/).map(clean).filter(Boolean);
+  return clean(value).split("\n").map(clean).filter(Boolean);
 }
 
 function renderResumeItem({ title, subtitle, subtitleHtml, date, details }) {
