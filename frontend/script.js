@@ -10,6 +10,8 @@ const translations = {
     "actions.save": "Save",
     "actions.clear": "Clear",
     "actions.download": "Download PDF",
+    "actions.themeDark": "Dark",
+    "actions.themeLight": "Light",
     "saveFiles.title": "Save Files",
     "saveFiles.slotName": "Slot name",
     "saveFiles.select": "Select a saved slot",
@@ -179,6 +181,8 @@ const translations = {
     "actions.save": "Guardar",
     "actions.clear": "Limpiar",
     "actions.download": "Descargar PDF",
+    "actions.themeDark": "Oscuro",
+    "actions.themeLight": "Claro",
     "saveFiles.title": "Archivos Guardados",
     "saveFiles.slotName": "Nombre del archivo",
     "saveFiles.select": "Selecciona un archivo guardado",
@@ -338,6 +342,8 @@ const translations = {
     "actions.save": "I-save",
     "actions.clear": "I-clear",
     "actions.download": "I-download PDF",
+    "actions.themeDark": "Madilim",
+    "actions.themeLight": "Maliwanag",
     "saveFiles.title": "Save Files",
     "saveFiles.slotName": "Pangalan ng slot",
     "saveFiles.select": "Pumili ng saved slot",
@@ -377,6 +383,7 @@ const translations = {
 };
 
 const defaultState = {
+  theme: getDefaultTheme(),
   language: "en",
   activeSectionTab: "personal",
   activeToolTab: "ats",
@@ -411,6 +418,8 @@ const defaultState = {
 let state = loadState();
 
 const languageToggle = document.getElementById("languageToggle");
+const themeToggle = document.getElementById("themeToggle");
+const themeIcon = document.getElementById("themeIcon");
 const saveBtn = document.getElementById("saveBtn");
 const clearBtn = document.getElementById("clearBtn");
 const downloadBtn = document.getElementById("downloadBtn");
@@ -425,9 +434,6 @@ const honorsSection = document.getElementById("honorsSection");
 const coursesSection = document.getElementById("coursesSection");
 const trainingsSection = document.getElementById("trainingsSection");
 const skillsSection = document.getElementById("skillsSection");
-const atsPanel = document.getElementById("atsPanel");
-const jobMatchPanel = document.getElementById("jobMatchPanel");
-const salaryPanel = document.getElementById("salaryPanel");
 const preview = document.getElementById("resumePreview");
 
 const debouncedSave = debounce(() => persistState(false), 500);
@@ -436,12 +442,20 @@ boot();
 
 async function boot() {
   bindUIActions();
+  applyTheme();
   applyStaticTranslations();
   await hydrateResumeFromDatabase();
   renderAll();
 }
 
 function bindUIActions() {
+  themeToggle.addEventListener("click", () => {
+    state.theme = state.theme === "dark" ? "light" : "dark";
+    applyTheme();
+    persistState(false);
+    applyStaticTranslations();
+  });
+
   languageToggle.addEventListener("click", () => {
     const order = ["en", "es", "tl"];
     const idx = order.indexOf(state.language);
@@ -483,7 +497,6 @@ function bindUIActions() {
   });
 
   bindSectionTabs();
-  bindToolTabs();
 }
 
 function bindSectionTabs() {
@@ -617,12 +630,8 @@ function renderAll() {
     { key: "date", type: "text" },
     { key: "details", type: "textarea" },
   ]);
-  renderAtsPanel();
-  renderJobMatchPanel();
-  renderSalaryPanel();
   renderPreview();
   applySectionTabState();
-  applyToolTabState();
 }
 
 function renderSaveFilesPanel() {
@@ -1911,7 +1920,21 @@ function applyStaticTranslations() {
         ? "Generador de CV Harvard"
         : "Tagabuo ng Harvard Resume";
   languageToggle.textContent = state.language.toUpperCase();
+  const isDark = state.theme === "dark";
+  const nextThemeLabel = isDark
+    ? t("actions.themeLight")
+    : t("actions.themeDark");
+  themeToggle.setAttribute("aria-pressed", String(isDark));
+  themeToggle.setAttribute("aria-label", nextThemeLabel);
+  themeToggle.setAttribute("title", nextThemeLabel);
+  if (themeIcon) {
+    themeIcon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+  }
   document.documentElement.lang = state.language;
+}
+
+function applyTheme() {
+  document.body.classList.toggle("dark-mode", state.theme === "dark");
 }
 
 function loadState() {
@@ -1925,6 +1948,7 @@ function loadState() {
     return {
       ...structuredClone(defaultState),
       ...parsed,
+      theme: parsed.theme === "dark" ? "dark" : "light",
       personal: {
         ...structuredClone(defaultState.personal),
         ...(parsed.personal || {}),
@@ -1968,6 +1992,7 @@ function persistState(showToast) {
 function getSanitizedStateForSave() {
   return {
     ...state,
+    theme: state.theme === "dark" ? "dark" : "light",
     personal: getSanitizedPersonalForSave(),
     saveSlots:
       state.saveSlots && typeof state.saveSlots === "object"
@@ -1989,9 +2014,15 @@ function isBlockedProfessionalTitle(value) {
   return clean(value).toLowerCase() === "bank";
 }
 
+function getDefaultTheme() {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
 async function syncResumeToDatabase() {
   try {
-    const response = await fetch("save_resume.php", {
+    const response = await fetch("../backend/save_resume.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ state: getSanitizedStateForSave() }),
@@ -2000,7 +2031,11 @@ async function syncResumeToDatabase() {
     if (!response.ok || payload.ok !== true) {
       return {
         ok: false,
-        message: payload.message || `HTTP ${response.status}`,
+        message:
+          payload.message ||
+          payload.error ||
+          payload.details ||
+          `HTTP ${response.status}`,
       };
     }
     return { ok: true, message: "" };
@@ -2018,7 +2053,7 @@ async function hydrateResumeFromDatabase() {
   }
 
   try {
-    const response = await fetch("load_resume.php", {
+    const response = await fetch("../backend/load_resume.php", {
       method: "GET",
       headers: { Accept: "application/json" },
     });

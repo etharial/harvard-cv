@@ -42,6 +42,12 @@ body {
   gap: 16px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .brand-wrap {
   max-width: 800px;
 }
@@ -68,6 +74,27 @@ body {
   min-height: 38px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.theme-toggle {
+  border: 1px solid var(--line-strong);
+  background: #ffffff;
+  color: #20364f;
+  border-radius: 999px;
+  width: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  font-weight: 700;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+}
+
+.theme-toggle[aria-pressed="true"] {
+  border-color: #0a4aad;
+  background: linear-gradient(135deg, #0b5ed7 0%, #0a4aad 100%);
+  color: #ffffff;
 }
 
 .app-layout {
@@ -493,12 +520,6 @@ body {
   font-size: 0.87rem;
 }
 
-.tools-area {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-}
-
 .tool-card {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -626,6 +647,110 @@ body {
   margin-top: 8px;
   font-size: 0.77rem;
   color: #5b7087;
+}
+
+body.dark-mode {
+  --bg: #0d1624;
+  --ink: #e4edf8;
+  --muted: #9eb1c9;
+  --panel: #152235;
+  --line: #2b3d56;
+  --line-strong: #3d5573;
+  --shadow: 0 16px 36px rgba(2, 8, 18, 0.45);
+  background:
+    radial-gradient(
+      circle at 90% -15%,
+      rgba(16, 185, 129, 0.13),
+      transparent 38%
+    ),
+    radial-gradient(circle at 0% 15%, rgba(11, 94, 215, 0.22), transparent 35%),
+    var(--bg);
+}
+
+body.dark-mode .panel {
+  background: linear-gradient(180deg, #122033 0%, #101c2d 100%);
+}
+
+body.dark-mode .language-toggle {
+  border-color: #3b5f85;
+  background: #10253d;
+  color: #d9e9ff;
+}
+
+body.dark-mode .theme-toggle {
+  border-color: #3b5f85;
+  background: #10253d;
+  color: #d9e9ff;
+}
+
+body.dark-mode .btn-secondary,
+body.dark-mode .btn-ghost,
+body.dark-mode .section-tab,
+body.dark-mode .tool-tab,
+body.dark-mode .add-btn,
+body.dark-mode .remove-btn,
+body.dark-mode .tool-card,
+body.dark-mode .privacy-box,
+body.dark-mode .save-files,
+body.dark-mode .salary-item,
+body.dark-mode .entry-block,
+body.dark-mode .input-wrap input,
+body.dark-mode .input-wrap textarea,
+body.dark-mode .save-files-row input,
+body.dark-mode .save-files-row select,
+body.dark-mode .result-box {
+  background: #16263a;
+  color: var(--ink);
+}
+
+body.dark-mode .btn-secondary {
+  color: #d9e8ff;
+}
+
+body.dark-mode .btn-ghost,
+body.dark-mode .section-tab,
+body.dark-mode .tool-tab,
+body.dark-mode .add-btn {
+  color: #c5d7ef;
+}
+
+body.dark-mode .privacy-box ul,
+body.dark-mode .tool-card p,
+body.dark-mode .analysis-list,
+body.dark-mode .note,
+body.dark-mode .meter-meta,
+body.dark-mode .save-files-list,
+body.dark-mode .empty-state,
+body.dark-mode .panel-header p,
+body.dark-mode .preview-head p,
+body.dark-mode .subtitle,
+body.dark-mode .entry-title,
+body.dark-mode .input-wrap label {
+  color: #9fb4cd;
+}
+
+body.dark-mode .meter-track {
+  background: #2b3c53;
+}
+
+body.dark-mode .chip.good {
+  background: #14342a;
+  color: #8ce7bd;
+}
+
+body.dark-mode .chip.miss {
+  background: #3a1f2b;
+  color: #ffb2cb;
+}
+
+body.dark-mode .result-score,
+body.dark-mode .salary-item strong {
+  color: #e1edfb;
+}
+
+body.dark-mode .resume-preview {
+  border-color: #314760;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
 @media (max-width: 1200px) {

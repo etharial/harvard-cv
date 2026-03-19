@@ -8,6 +8,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
 	<link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,7 +17,12 @@
 			<h1 class="brand">Harvard Resume Builder</h1>
 			<p class="subtitle" data-i18n="hero.subtitle"></p>
 		</div>
-		<button id="languageToggle" class="language-toggle" type="button">EN</button>
+		<div class="header-actions">
+			<button id="themeToggle" class="theme-toggle" type="button" aria-label="Enable dark mode" title="Enable dark mode">
+				<i id="themeIcon" class="fa-solid fa-moon" aria-hidden="true"></i>
+			</button>
+			<button id="languageToggle" class="language-toggle" type="button">EN</button>
+		</div>
 	</header>
 
 	<main class="app-layout">
@@ -66,21 +72,6 @@
 				<section class="form-section dynamic-section tab-panel" id="trainingsSection" data-tab-panel="trainings"></section>
 				<section class="form-section dynamic-section tab-panel" id="honorsSection" data-tab-panel="honors"></section>
 			</form>
-
-			<section class="form-section tools-area">
-				<div class="section-head">
-					<h3 data-i18n="tools.title"></h3>
-				</div>
-				<nav class="tool-tabs" id="toolTabs" aria-label="Career tools">
-					<button type="button" class="tool-tab active" data-tool-target="ats" data-i18n="tools.ats"></button>
-					<button type="button" class="tool-tab" data-tool-target="job" data-i18n="tools.jobMatch"></button>
-					<button type="button" class="tool-tab" data-tool-target="salary" data-i18n="tools.salary"></button>
-				</nav>
-
-				<div class="tool-panel active" id="atsPanel" data-tool-panel="ats"></div>
-				<div class="tool-panel" id="jobMatchPanel" data-tool-panel="job"></div>
-				<div class="tool-panel" id="salaryPanel" data-tool-panel="salary"></div>
-			</section>
 		</section>
 
 		<section class="panel preview-panel">
