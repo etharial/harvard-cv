@@ -55,6 +55,8 @@ const translations = {
       "Edit, duplicate, and adapt for any role in minutes.",
     "preview.title": "Live Preview",
     "preview.description": "Harvard-style and ATS-compatible structure.",
+    "layout.standard": "Standard Harvard CV",
+    "layout.withPhoto": "Harvard CV with Photo",
     "section.personal": "Personal",
     "section.education": "Education",
     "section.experience": "Experience",
@@ -108,6 +110,7 @@ const translations = {
     "labels.website": "Website or LinkedIn",
     "labels.github": "GitHub",
     "labels.summary": "Professional Summary",
+    "labels.photo": "Profile Photo (Optional)",
     "labels.school": "School",
     "labels.degree": "Degree / Program",
     "labels.company": "Company",
@@ -235,6 +238,8 @@ const translations = {
       "Edita y adapta tu CV para cualquier vacante rapidamente.",
     "preview.title": "Vista Previa",
     "preview.description": "Estructura estilo Harvard y compatible con ATS.",
+    "layout.standard": "CV Harvard Estandar",
+    "layout.withPhoto": "CV Harvard con Foto",
     "section.personal": "Personal",
     "section.education": "Educacion",
     "section.experience": "Experiencia",
@@ -288,6 +293,7 @@ const translations = {
     "labels.website": "Sitio web o LinkedIn",
     "labels.github": "GitHub",
     "labels.summary": "Resumen Profesional",
+    "labels.photo": "Foto de Perfil",
     "labels.school": "Institucion",
     "labels.degree": "Titulo / Programa",
     "labels.company": "Empresa",
@@ -404,6 +410,8 @@ const translations = {
     "privacy.editAnytime": "Madaling i-edit para sa iba-ibang trabaho.",
     "preview.title": "Live Preview",
     "preview.description": "Harvard-style at ATS-compatible na format.",
+    "layout.standard": "Standard Harvard CV",
+    "layout.withPhoto": "Harvard CV na may Larawan",
     "section.personal": "Personal",
     "section.education": "Edukasyon",
     "section.experience": "Karanasan",
@@ -424,6 +432,7 @@ const defaultState = {
   theme: getDefaultTheme(),
   language: "en",
   activeSectionTab: "personal",
+  cvLayout: "standard",
   activeToolTab: "ats",
   personal: {
     fullName: "",
@@ -434,6 +443,7 @@ const defaultState = {
     website: "",
     github: "",
     summary: "",
+    photoDataUrl: "",
   },
   education: [emptyEducation()],
   experience: [emptyExperience()],
@@ -472,6 +482,7 @@ const coursesSection = document.getElementById("coursesSection");
 const trainingsSection = document.getElementById("trainingsSection");
 const skillsSection = document.getElementById("skillsSection");
 const preview = document.getElementById("resumePreview");
+const cvLayoutTabs = document.getElementById("cvLayoutTabs");
 
 const debouncedSave = debounce(() => persistState(false), 500);
 
@@ -503,6 +514,39 @@ function bindUIActions() {
   });
 
   bindSectionTabs();
+  bindCvLayoutTabs();
+}
+
+function bindCvLayoutTabs() {
+  if (!cvLayoutTabs) {
+    return;
+  }
+
+  const tabs = cvLayoutTabs.querySelectorAll(".cv-layout-tab");
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const layout = clean(tab.getAttribute("data-cv-layout"));
+      state.cvLayout = layout === "withPhoto" ? "withPhoto" : "standard";
+      persistState(false);
+      applyCvLayoutTabState();
+      renderPreview();
+    });
+  });
+
+  applyCvLayoutTabState();
+}
+
+function applyCvLayoutTabState() {
+  if (!cvLayoutTabs) {
+    return;
+  }
+
+  cvLayoutTabs.querySelectorAll(".cv-layout-tab").forEach((tab) => {
+    tab.classList.toggle(
+      "active",
+      tab.getAttribute("data-cv-layout") === state.cvLayout,
+    );
+  });
 }
 
 function handleClearResume() {
@@ -664,6 +708,7 @@ function renderAll() {
   ]);
   renderPreview();
   applySectionTabState();
+  applyCvLayoutTabState();
 }
 
 function renderSaveFilesPanel() {
@@ -733,10 +778,10 @@ function renderSaveFilesPanel() {
   slotSelect.addEventListener("change", (event) => {
     state.selectedSaveSlot = clean(event.target.value);
     persistState(false);
-    renderSaveFilesPanel();
+    slotNameInput.value = state.selectedSaveSlot;
   });
 
-  document.getElementById("saveSlotBtn").addEventListener("click", () => {
+  document.getElementById("saveSlotBtn").addEventListener("click", async () => {
     const slotName = clean(slotNameInput.value || state.selectedSaveSlot);
     if (!slotName) {
       window.alert(t("saveFiles.slotName"));
@@ -750,7 +795,7 @@ function renderSaveFilesPanel() {
     state.selectedSaveSlot = slotName;
     persistState(false);
     renderSaveFilesPanel();
-    window.alert(t("saveFiles.saved"));
+    await finalizeSlotMutation("saveFiles.saved");
   });
 
   document.getElementById("loadSlotBtn").addEventListener("click", () => {
@@ -772,53 +817,70 @@ function renderSaveFilesPanel() {
     window.alert(t("saveFiles.loaded"));
   });
 
-  document.getElementById("deleteSlotBtn").addEventListener("click", () => {
-    const slotName = clean(slotSelect.value || state.selectedSaveSlot);
-    if (!slotName || !state.saveSlots[slotName]) {
-      return;
-    }
+  document
+    .getElementById("deleteSlotBtn")
+    .addEventListener("click", async () => {
+      const slotName = clean(slotSelect.value || state.selectedSaveSlot);
+      if (!slotName || !state.saveSlots[slotName]) {
+        return;
+      }
 
-    if (!window.confirm(t("saveFiles.confirmDelete"))) {
-      return;
-    }
+      if (!window.confirm(t("saveFiles.confirmDelete"))) {
+        return;
+      }
 
-    delete state.saveSlots[slotName];
-    if (state.selectedSaveSlot === slotName) {
-      state.selectedSaveSlot = "";
-    }
-    persistState(false);
-    renderSaveFilesPanel();
-    window.alert(t("saveFiles.deleted"));
-  });
+      delete state.saveSlots[slotName];
+      if (state.selectedSaveSlot === slotName) {
+        state.selectedSaveSlot = "";
+      }
+      persistState(false);
+      renderSaveFilesPanel();
+      await finalizeSlotMutation("saveFiles.deleted");
+    });
 
-  document.getElementById("renameSlotBtn").addEventListener("click", () => {
-    const currentSlotName = clean(slotSelect.value || state.selectedSaveSlot);
-    const nextSlotName = clean(slotNameInput.value);
-    if (!currentSlotName || !state.saveSlots[currentSlotName]) {
-      return;
-    }
-    if (!nextSlotName) {
-      window.alert(t("saveFiles.slotName"));
-      return;
-    }
+  document
+    .getElementById("renameSlotBtn")
+    .addEventListener("click", async () => {
+      const currentSlotName = clean(
+        slotSelect.value || state.selectedSaveSlot || slotNameInput.value,
+      );
 
-    if (
-      currentSlotName !== nextSlotName &&
-      state.saveSlots[nextSlotName] &&
-      !window.confirm(t("saveFiles.confirmOverwrite"))
-    ) {
-      return;
-    }
+      if (!currentSlotName || !state.saveSlots[currentSlotName]) {
+        window.alert(t("saveFiles.select"));
+        return;
+      }
 
-    state.saveSlots[nextSlotName] = state.saveSlots[currentSlotName];
-    if (nextSlotName !== currentSlotName) {
-      delete state.saveSlots[currentSlotName];
-    }
-    state.selectedSaveSlot = nextSlotName;
-    persistState(false);
-    renderSaveFilesPanel();
-    window.alert(t("saveFiles.renamed"));
-  });
+      let nextSlotName = clean(slotNameInput.value);
+      if (!nextSlotName || nextSlotName === currentSlotName) {
+        const promptedName = window.prompt(
+          t("saveFiles.slotName"),
+          currentSlotName,
+        );
+        nextSlotName = clean(promptedName);
+      }
+
+      if (!nextSlotName) {
+        window.alert(t("saveFiles.slotName"));
+        return;
+      }
+
+      if (
+        currentSlotName !== nextSlotName &&
+        state.saveSlots[nextSlotName] &&
+        !window.confirm(t("saveFiles.confirmOverwrite"))
+      ) {
+        return;
+      }
+
+      state.saveSlots[nextSlotName] = state.saveSlots[currentSlotName];
+      if (nextSlotName !== currentSlotName) {
+        delete state.saveSlots[currentSlotName];
+      }
+      state.selectedSaveSlot = nextSlotName;
+      persistState(false);
+      renderSaveFilesPanel();
+      await finalizeSlotMutation("saveFiles.renamed");
+    });
 
   document
     .getElementById("clearResumeBtn")
@@ -836,6 +898,75 @@ function renderSaveFilesPanel() {
     });
 
   bindSectionOrderInteractions();
+}
+
+async function finalizeSlotMutation(successMessageKey) {
+  const syncResult = await syncResumeToDatabase();
+  if (syncResult.ok) {
+    window.alert(t(successMessageKey));
+    return;
+  }
+
+  const remoteConfirmed = await verifyRemoteSlotSync();
+  if (remoteConfirmed) {
+    window.alert(t(successMessageKey));
+    return;
+  }
+
+  window.alert(
+    `${t(successMessageKey)}\n${t("save.localOnly")}\n${syncResult.message}`,
+  );
+}
+
+async function verifyRemoteSlotSync() {
+  try {
+    const response = await fetch("../backend/load_resume.php", {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const payload = await response.json().catch(() => ({}));
+    if (!payload || payload.ok !== true || !payload.state) {
+      return false;
+    }
+
+    const remoteSlots =
+      payload.state.saveSlots && typeof payload.state.saveSlots === "object"
+        ? payload.state.saveSlots
+        : {};
+    const localSlots =
+      state.saveSlots && typeof state.saveSlots === "object"
+        ? state.saveSlots
+        : {};
+
+    if (!haveSameSlotNames(localSlots, remoteSlots)) {
+      return false;
+    }
+
+    const expectedSelected = clean(state.selectedSaveSlot || "");
+    const remoteSelected = clean(payload.state.selectedSaveSlot || "");
+
+    return !expectedSelected || expectedSelected === remoteSelected;
+  } catch (error) {
+    return false;
+  }
+}
+
+function haveSameSlotNames(localSlots, remoteSlots) {
+  const localKeys = Object.keys(localSlots).sort((a, b) => a.localeCompare(b));
+  const remoteKeys = Object.keys(remoteSlots).sort((a, b) =>
+    a.localeCompare(b),
+  );
+
+  if (localKeys.length !== remoteKeys.length) {
+    return false;
+  }
+
+  return localKeys.every((key, index) => key === remoteKeys[index]);
 }
 
 function bindSectionOrderInteractions() {
@@ -955,6 +1086,7 @@ function applySnapshotToState(snapshot) {
   state = {
     ...structuredClone(defaultState),
     ...snapshot,
+    cvLayout: snapshot.cvLayout === "withPhoto" ? "withPhoto" : "standard",
     personal: {
       ...structuredClone(defaultState.personal),
       ...(snapshot.personal || {}),
@@ -1019,6 +1151,45 @@ function renderPersonalSection() {
     });
     grid.appendChild(wrap);
   });
+
+  const photoWrap = document.createElement("div");
+  photoWrap.className = "input-wrap";
+  photoWrap.style.gridColumn = "1 / -1";
+  photoWrap.innerHTML = `
+    <label for="personal-photo">${t("labels.photo")}</label>
+    <input id="personal-photo" type="file" accept="image/*">
+    ${clean(state.personal.photoDataUrl) ? `<button id="removePhotoBtn" class="btn btn-ghost" type="button" style="margin-top: 8px;">${t("remove")}</button>` : ""}
+  `;
+  grid.appendChild(photoWrap);
+
+  const photoInput = document.getElementById("personal-photo");
+  photoInput.addEventListener("change", (event) => {
+    const [file] = event.target.files || [];
+    if (!file) {
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      window.alert("Please upload a valid image file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.personal.photoDataUrl = clean(reader.result);
+      persistState(false);
+      renderAll();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  const removePhotoBtn = document.getElementById("removePhotoBtn");
+  if (removePhotoBtn) {
+    removePhotoBtn.addEventListener("click", () => {
+      state.personal.photoDataUrl = "";
+      persistState(false);
+      renderAll();
+    });
+  }
 }
 
 function renderDynamicSection(sectionKey, container, schema) {
@@ -1591,6 +1762,7 @@ function updateJobMatchResult(result) {
 
 function renderPreview() {
   const personalForPreview = getSanitizedPersonalForSave();
+  const isPhotoLayout = state.cvLayout === "withPhoto";
   const hasMainContent =
     hasPersonalContent(personalForPreview) ||
     hasEntries(state.education, ["school", "degree", "details"]) ||
@@ -1604,6 +1776,7 @@ function renderPreview() {
     hasEntries(state.aiWorkflow, ["title", "details"]);
 
   if (!hasMainContent) {
+    preview.classList.remove("with-photo-layout");
     preview.innerHTML = `<p class="empty-state">${t("empty.preview")}</p>`;
     return;
   }
@@ -1675,11 +1848,45 @@ function renderPreview() {
     .map((sectionKey) => sectionHtmlByKey[sectionKey] || "")
     .join("");
 
+  const headerHtml = isPhotoLayout
+    ? renderPreviewHeaderWithPhoto(personalForPreview, contactParts)
+    : renderPreviewHeaderStandard(personalForPreview, contactParts);
+
+  preview.classList.toggle("with-photo-layout", isPhotoLayout);
+
   preview.innerHTML = `
+    ${headerHtml}
+    ${orderedSections}
+  `;
+}
+
+function renderPreviewHeaderStandard(personalForPreview, contactParts) {
+  return `
     <h1 class="resume-name">${esc(clean(personalForPreview.fullName) || t("ph.fullName"))}</h1>
     ${clean(personalForPreview.professionalTitle) ? `<p class="resume-title">${esc(clean(personalForPreview.professionalTitle))}</p>` : ""}
     ${contactParts.length ? `<div class="resume-contact">${contactParts.map(esc).join(" | ")}</div>` : ""}
-    ${orderedSections}
+  `;
+}
+
+function renderPreviewHeaderWithPhoto(personalForPreview, contactParts) {
+  const photo = clean(personalForPreview.photoDataUrl);
+  const name = clean(personalForPreview.fullName) || t("ph.fullName");
+  const initials = (name.match(/\b\w/g) || [])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  return `
+    <div class="resume-head-with-photo">
+      <div class="resume-head-main">
+        <h1 class="resume-name">${esc(name)}</h1>
+        ${clean(personalForPreview.professionalTitle) ? `<p class="resume-title">${esc(clean(personalForPreview.professionalTitle))}</p>` : ""}
+        ${contactParts.length ? `<div class="resume-contact">${contactParts.map(esc).join(" | ")}</div>` : ""}
+      </div>
+      <div class="resume-photo-wrap">
+        ${photo ? `<img class="resume-photo" src="${esc(photo)}" alt="${esc(name)}">` : `<div class="resume-photo-placeholder">${esc(initials || "CV")}</div>`}
+      </div>
+    </div>
   `;
 }
 
@@ -2158,6 +2365,7 @@ function loadState() {
     return {
       ...structuredClone(defaultState),
       ...parsed,
+      cvLayout: parsed.cvLayout === "withPhoto" ? "withPhoto" : "standard",
       theme: parsed.theme === "dark" ? "dark" : "light",
       personal: {
         ...structuredClone(defaultState.personal),
@@ -2204,6 +2412,7 @@ function persistState(showToast) {
 function getSanitizedStateForSave() {
   return {
     ...state,
+    cvLayout: state.cvLayout === "withPhoto" ? "withPhoto" : "standard",
     theme: state.theme === "dark" ? "dark" : "light",
     personal: getSanitizedPersonalForSave(),
     saveSlots:
@@ -2241,8 +2450,19 @@ async function syncResumeToDatabase() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ state: getSanitizedStateForSave() }),
     });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok || payload.ok !== true) {
+
+    // Be tolerant of noisy PHP output: DB write can succeed even if JSON parsing fails.
+    const rawBody = await response.text();
+    let payload = {};
+    if (clean(rawBody)) {
+      try {
+        payload = JSON.parse(rawBody);
+      } catch (error) {
+        payload = {};
+      }
+    }
+
+    if (!response.ok) {
       return {
         ok: false,
         message:
@@ -2252,6 +2472,23 @@ async function syncResumeToDatabase() {
           `HTTP ${response.status}`,
       };
     }
+
+    if (typeof payload.ok === "boolean") {
+      if (payload.ok) {
+        return { ok: true, message: "" };
+      }
+
+      return {
+        ok: false,
+        message:
+          payload.message ||
+          payload.error ||
+          payload.details ||
+          "MySQL sync failed.",
+      };
+    }
+
+    // For 2xx responses without a valid/expected JSON body, treat as success.
     return { ok: true, message: "" };
   } catch (error) {
     return {
@@ -2277,10 +2514,28 @@ async function hydrateResumeFromDatabase() {
 
     const remoteState = payload.state;
 
-    // If we have localStorage, merge only saveSlots and selectedSaveSlot from db
+    // If we have localStorage, keep local slot edits and fill in any missing slots from db.
     if (hasLocalStorage) {
-      state.saveSlots = remoteState.saveSlots || {};
-      state.selectedSaveSlot = clean(remoteState.selectedSaveSlot || "");
+      const localSlots =
+        state.saveSlots && typeof state.saveSlots === "object"
+          ? state.saveSlots
+          : {};
+      const remoteSlots =
+        remoteState.saveSlots && typeof remoteState.saveSlots === "object"
+          ? remoteState.saveSlots
+          : {};
+
+      state.saveSlots = {
+        ...remoteSlots,
+        ...localSlots,
+      };
+
+      const preferredSelection = clean(
+        state.selectedSaveSlot || remoteState.selectedSaveSlot || "",
+      );
+      state.selectedSaveSlot = state.saveSlots[preferredSelection]
+        ? preferredSelection
+        : "";
       persistState(false);
       return;
     }
@@ -2289,6 +2544,7 @@ async function hydrateResumeFromDatabase() {
     state = {
       ...structuredClone(defaultState),
       ...remoteState,
+      cvLayout: remoteState.cvLayout === "withPhoto" ? "withPhoto" : "standard",
       personal: {
         ...structuredClone(defaultState.personal),
         ...(remoteState.personal || {}),

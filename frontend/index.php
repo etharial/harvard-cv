@@ -74,6 +74,10 @@
 			<div class="preview-head">
 				<h2 data-i18n="preview.title"></h2>
 				<p data-i18n="preview.description"></p>
+				<div class="cv-layout-tabs" id="cvLayoutTabs" aria-label="CV layout options">
+					<button type="button" class="cv-layout-tab active" data-cv-layout="standard" data-i18n="layout.standard"></button>
+					<button type="button" class="cv-layout-tab" data-cv-layout="withPhoto" data-i18n="layout.withPhoto"></button>
+				</div>
 			</div>
 			<article id="resumePreview" class="resume-preview" aria-live="polite"></article>
 		</section>

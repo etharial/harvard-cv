@@ -140,6 +140,31 @@ body {
   font-size: 0.9rem;
 }
 
+.cv-layout-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.cv-layout-tab {
+  border: 1px solid var(--line-strong);
+  background: #ffffff;
+  color: #27425f;
+  border-radius: 999px;
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cv-layout-tab.active {
+  border-color: #0a4aad;
+  background: linear-gradient(135deg, #0b5ed7 0%, #0a4aad 100%);
+  color: #fff;
+}
+
 .toolbar {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -518,6 +543,47 @@ body {
   line-height: 1.5;
 }
 
+.resume-head-with-photo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 86px;
+  gap: 12px;
+  align-items: center;
+}
+
+.resume-head-with-photo .resume-name,
+.resume-head-with-photo .resume-title,
+.resume-head-with-photo .resume-contact {
+  text-align: left;
+}
+
+.resume-photo-wrap {
+  width: 86px;
+  height: 86px;
+}
+
+.resume-photo,
+.resume-photo-placeholder {
+  width: 86px;
+  height: 86px;
+  border-radius: 8px;
+  border: 1px solid #a0a7af;
+}
+
+.resume-photo {
+  object-fit: cover;
+  display: block;
+}
+
+.resume-photo-placeholder {
+  display: grid;
+  place-items: center;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #526377;
+  background: #f4f7fb;
+}
+
 .resume-section {
   margin-top: 14px;
   border-top: 1px solid #8d8d8d;
@@ -790,6 +856,7 @@ body.dark-mode .btn-secondary,
 body.dark-mode .btn-ghost,
 body.dark-mode .section-tab,
 body.dark-mode .tool-tab,
+body.dark-mode .cv-layout-tab,
 body.dark-mode .add-btn,
 body.dark-mode .remove-btn,
 body.dark-mode .tool-card,
@@ -813,8 +880,13 @@ body.dark-mode .btn-secondary {
 body.dark-mode .btn-ghost,
 body.dark-mode .section-tab,
 body.dark-mode .tool-tab,
+body.dark-mode .cv-layout-tab,
 body.dark-mode .add-btn {
   color: #c5d7ef;
+}
+
+body.dark-mode .cv-layout-tab.active {
+  color: #fff;
 }
 
 body.dark-mode .privacy-box ul,
@@ -968,6 +1040,20 @@ body.dark-mode .tool-tabs::-webkit-scrollbar-thumb:hover {
   .utility-grid {
     margin-top: 8px;
     gap: 8px;
+  }
+
+  .resume-head-with-photo {
+    grid-template-columns: 1fr;
+  }
+
+  .resume-head-with-photo .resume-name,
+  .resume-head-with-photo .resume-title,
+  .resume-head-with-photo .resume-contact {
+    text-align: center;
+  }
+
+  .resume-photo-wrap {
+    margin: 0 auto;
   }
 }
 
