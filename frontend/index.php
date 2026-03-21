@@ -32,21 +32,17 @@
 				<p data-i18n="form.description"></p>
 			</div>
 
-			<div class="toolbar">
-				<button id="saveBtn" class="btn btn-secondary" type="button" data-i18n="actions.save"></button>
-				<button id="clearBtn" class="btn btn-ghost" type="button" data-i18n="actions.clear"></button>
-				<button id="downloadBtn" class="btn btn-primary" type="button" data-i18n="actions.download"></button>
-			</div>
+			<div class="utility-grid">
+				<div class="save-files" id="saveFilesPanel"></div>
 
-			<div class="save-files" id="saveFilesPanel"></div>
-
-			<div class="privacy-box">
-				<h3 data-i18n="privacy.title"></h3>
-				<ul>
-					<li data-i18n="privacy.localOnly"></li>
-					<li data-i18n="privacy.noAccount"></li>
-					<li data-i18n="privacy.editAnytime"></li>
-				</ul>
+				<details class="privacy-box privacy-collapsible">
+					<summary data-i18n="privacy.title"></summary>
+					<ul>
+						<li data-i18n="privacy.localOnly"></li>
+						<li data-i18n="privacy.noAccount"></li>
+						<li data-i18n="privacy.editAnytime"></li>
+					</ul>
+				</details>
 			</div>
 
 			<form id="resumeForm" novalidate>

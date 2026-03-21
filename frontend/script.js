@@ -1,4 +1,15 @@
 const STORAGE_KEY = "harvardResumeBuilder.v2";
+const PREVIEW_SECTION_ORDER_DEFAULT = [
+  "summary",
+  "education",
+  "experience",
+  "leadership",
+  "projects",
+  "skills",
+  "courses",
+  "trainings",
+  "honors",
+];
 
 const translations = {
   en: {
@@ -18,15 +29,23 @@ const translations = {
     "saveFiles.save": "Save Slot",
     "saveFiles.load": "Load Slot",
     "saveFiles.delete": "Delete Slot",
+    "saveFiles.rename": "Rename Slot",
     "saveFiles.empty": "No save files yet.",
     "saveFiles.savedAt": "Saved",
     "saveFiles.slotPlaceholder": "My Resume Slot",
+    "saveFiles.customizeLayout": "Customize Layout",
+    "saveFiles.hideLayout": "Hide Layout Controls",
+    "saveFiles.customizeOrder": "CV section order",
+    "saveFiles.dragHint": "Drag sections to customize the Harvard CV paper order.",
     "saveFiles.confirmLoad":
       "Load selected save file? Unsaved edits will be replaced.",
     "saveFiles.confirmDelete": "Delete selected save file?",
+    "saveFiles.confirmOverwrite":
+      "A slot with that name already exists. Replace it?",
     "saveFiles.saved": "Save file updated.",
     "saveFiles.loaded": "Save file loaded.",
     "saveFiles.deleted": "Save file deleted.",
+    "saveFiles.renamed": "Save file renamed.",
     "privacy.title": "Privacy First",
     "privacy.localOnly":
       "Resume data stays in your browser. Personal profile can sync to your own MySQL.",
@@ -189,15 +208,24 @@ const translations = {
     "saveFiles.save": "Guardar Archivo",
     "saveFiles.load": "Cargar Archivo",
     "saveFiles.delete": "Eliminar Archivo",
+    "saveFiles.rename": "Renombrar Archivo",
     "saveFiles.empty": "No hay archivos guardados.",
     "saveFiles.savedAt": "Guardado",
     "saveFiles.slotPlaceholder": "Mi CV Slot",
+    "saveFiles.customizeLayout": "Personalizar Diseno",
+    "saveFiles.hideLayout": "Ocultar Controles de Diseno",
+    "saveFiles.customizeOrder": "Orden de secciones del CV",
+    "saveFiles.dragHint":
+      "Arrastra secciones para personalizar el orden del CV Harvard.",
     "saveFiles.confirmLoad":
       "Cargar archivo seleccionado? Los cambios sin guardar se reemplazaran.",
     "saveFiles.confirmDelete": "Eliminar archivo guardado seleccionado?",
+    "saveFiles.confirmOverwrite":
+      "Ya existe un archivo con ese nombre. Reemplazarlo?",
     "saveFiles.saved": "Archivo guardado actualizado.",
     "saveFiles.loaded": "Archivo guardado cargado.",
     "saveFiles.deleted": "Archivo guardado eliminado.",
+    "saveFiles.renamed": "Archivo guardado renombrado.",
     "privacy.title": "Privacidad Primero",
     "privacy.localOnly":
       "Los datos se guardan en tu navegador. El perfil personal puede sincronizarse con tu MySQL.",
@@ -350,15 +378,23 @@ const translations = {
     "saveFiles.save": "Save Slot",
     "saveFiles.load": "Load Slot",
     "saveFiles.delete": "Delete Slot",
+    "saveFiles.rename": "Rename Slot",
     "saveFiles.empty": "Wala pang save file.",
     "saveFiles.savedAt": "Na-save",
     "saveFiles.slotPlaceholder": "Resume Slot",
+    "saveFiles.customizeLayout": "Ayusin ang Layout",
+    "saveFiles.hideLayout": "Itago ang Layout Controls",
+    "saveFiles.customizeOrder": "Ayos ng CV sections",
+    "saveFiles.dragHint": "I-drag ang sections para ayusin ang Harvard CV order.",
     "saveFiles.confirmLoad":
       "I-load ang napiling save file? Mapapalitan ang unsaved changes.",
     "saveFiles.confirmDelete": "Burahin ang napiling save file?",
+    "saveFiles.confirmOverwrite":
+      "May slot na gamit ang pangalang ito. I-replace ito?",
     "saveFiles.saved": "Na-update ang save file.",
     "saveFiles.loaded": "Na-load ang save file.",
     "saveFiles.deleted": "Nabura ang save file.",
+    "saveFiles.renamed": "Napalitan ang pangalan ng save file.",
     "privacy.title": "Privacy Muna",
     "privacy.localOnly":
       "Nasa browser mo lang ang data; puwedeng mag-sync sa sarili mong MySQL.",
@@ -409,6 +445,8 @@ const defaultState = {
   languages: "",
   certifications: "",
   interests: "",
+  sectionOrder: [...PREVIEW_SECTION_ORDER_DEFAULT],
+  showSectionOrderControls: false,
   saveSlots: {},
   selectedSaveSlot: "",
   jobDescription: "",
@@ -420,9 +458,6 @@ let state = loadState();
 const languageToggle = document.getElementById("languageToggle");
 const themeToggle = document.getElementById("themeToggle");
 const themeIcon = document.getElementById("themeIcon");
-const saveBtn = document.getElementById("saveBtn");
-const clearBtn = document.getElementById("clearBtn");
-const downloadBtn = document.getElementById("downloadBtn");
 const saveFilesPanel = document.getElementById("saveFilesPanel");
 
 const personalSection = document.getElementById("personalSection");
@@ -465,40 +500,33 @@ function bindUIActions() {
     renderAll();
   });
 
-  saveBtn.addEventListener("click", async () => {
-    persistState(false);
-    const syncResult = await syncResumeToDatabase();
-    if (syncResult.ok) {
-      window.alert(t("save.success"));
-      return;
-    }
-    window.alert(`${t("save.localOnly")}\n${syncResult.message}`);
-  });
-
-  clearBtn.addEventListener("click", () => {
-    const ok = window.confirm(t("clear.confirm"));
-    if (!ok) {
-      return;
-    }
-    const currentSlots = state.saveSlots || {};
-    state = structuredClone(defaultState);
-    state.education = [emptyEducation()];
-    state.experience = [emptyExperience()];
-    state.projects = [emptyProject()];
-    state.leadership = [emptyLeadership()];
-    state.honors = [emptyHonor()];
-    state.courses = [emptyCourse()];
-    state.trainings = [emptyTraining()];
-    state.saveSlots = currentSlots;
-    persistState(false);
-    renderAll();
-  });
-
-  downloadBtn.addEventListener("click", () => {
-    window.print();
-  });
-
   bindSectionTabs();
+}
+
+function handleClearResume() {
+  const ok = window.confirm(t("clear.confirm"));
+  if (!ok) {
+    return;
+  }
+
+  const currentSlots = state.saveSlots || {};
+  state = structuredClone(defaultState);
+  state.education = [emptyEducation()];
+  state.experience = [emptyExperience()];
+  state.projects = [emptyProject()];
+  state.leadership = [emptyLeadership()];
+  state.honors = [emptyHonor()];
+  state.courses = [emptyCourse()];
+  state.trainings = [emptyTraining()];
+  state.aiWorkflow = [emptyAiWorkflow()];
+  state.sectionOrder = [...PREVIEW_SECTION_ORDER_DEFAULT];
+  state.saveSlots = currentSlots;
+  persistState(false);
+  renderAll();
+}
+
+function handleDownloadPdf() {
+  window.print();
 }
 
 function bindSectionTabs() {
@@ -641,6 +669,8 @@ function renderSaveFilesPanel() {
     return;
   }
 
+  state.sectionOrder = sanitizeSectionOrder(state.sectionOrder);
+
   const slotKeys = Object.keys(state.saveSlots || {}).sort((a, b) =>
     a.localeCompare(b),
   );
@@ -663,8 +693,34 @@ function renderSaveFilesPanel() {
       <button id="saveSlotBtn" class="btn btn-secondary" type="button">${t("saveFiles.save")}</button>
       <button id="loadSlotBtn" class="btn btn-ghost" type="button">${t("saveFiles.load")}</button>
       <button id="deleteSlotBtn" class="btn btn-ghost" type="button">${t("saveFiles.delete")}</button>
+      <button id="renameSlotBtn" class="btn btn-ghost" type="button">${t("saveFiles.rename")}</button>
+    </div>
+    <div class="save-files-secondary-actions">
+      <button id="clearResumeBtn" class="btn btn-ghost" type="button">${t("actions.clear")}</button>
+      <button id="downloadPdfBtn" class="btn btn-primary" type="button">${t("actions.download")}</button>
     </div>
     <div class="save-files-list">${renderSaveSlotSummary(slotKeys)}</div>
+    <div class="save-files-layout-toggle-wrap">
+      <button id="toggleLayoutControlsBtn" class="btn btn-ghost save-files-layout-toggle" type="button">
+        ${state.showSectionOrderControls ? t("saveFiles.hideLayout") : t("saveFiles.customizeLayout")}
+      </button>
+    </div>
+    <div class="save-files-order">
+      <p class="save-files-order-title">${t("saveFiles.customizeOrder")}</p>
+      <p class="save-files-order-hint">${t("saveFiles.dragHint")}</p>
+      <div class="section-order-list ${state.showSectionOrderControls ? "active" : ""}" id="sectionOrderList">
+        ${state.sectionOrder
+          .map(
+            (sectionKey) => `
+              <button class="section-order-item" type="button" draggable="true" data-section-key="${esc(sectionKey)}">
+                <span class="section-order-handle" aria-hidden="true">::</span>
+                <span>${esc(getPreviewSectionLabel(sectionKey))}</span>
+              </button>
+            `,
+          )
+          .join("")}
+      </div>
+    </div>
   `;
 
   const slotNameInput = document.getElementById("saveSlotNameInput");
@@ -732,6 +788,139 @@ function renderSaveFilesPanel() {
     renderSaveFilesPanel();
     window.alert(t("saveFiles.deleted"));
   });
+
+  document.getElementById("renameSlotBtn").addEventListener("click", () => {
+    const currentSlotName = clean(slotSelect.value || state.selectedSaveSlot);
+    const nextSlotName = clean(slotNameInput.value);
+    if (!currentSlotName || !state.saveSlots[currentSlotName]) {
+      return;
+    }
+    if (!nextSlotName) {
+      window.alert(t("saveFiles.slotName"));
+      return;
+    }
+
+    if (
+      currentSlotName !== nextSlotName &&
+      state.saveSlots[nextSlotName] &&
+      !window.confirm(t("saveFiles.confirmOverwrite"))
+    ) {
+      return;
+    }
+
+    state.saveSlots[nextSlotName] = state.saveSlots[currentSlotName];
+    if (nextSlotName !== currentSlotName) {
+      delete state.saveSlots[currentSlotName];
+    }
+    state.selectedSaveSlot = nextSlotName;
+    persistState(false);
+    renderSaveFilesPanel();
+    window.alert(t("saveFiles.renamed"));
+  });
+
+  document
+    .getElementById("clearResumeBtn")
+    .addEventListener("click", handleClearResume);
+  document
+    .getElementById("downloadPdfBtn")
+    .addEventListener("click", handleDownloadPdf);
+
+  document
+    .getElementById("toggleLayoutControlsBtn")
+    .addEventListener("click", () => {
+      state.showSectionOrderControls = !state.showSectionOrderControls;
+      persistState(false);
+      renderSaveFilesPanel();
+    });
+
+  bindSectionOrderInteractions();
+}
+
+function bindSectionOrderInteractions() {
+  const orderItems = document.querySelectorAll(".section-order-item");
+  let draggedSectionKey = "";
+
+  orderItems.forEach((item) => {
+    item.addEventListener("dragstart", () => {
+      draggedSectionKey = item.dataset.sectionKey || "";
+      item.classList.add("dragging");
+    });
+
+    item.addEventListener("dragend", () => {
+      draggedSectionKey = "";
+      item.classList.remove("dragging");
+      document
+        .querySelectorAll(".section-order-item")
+        .forEach((node) => node.classList.remove("drag-over"));
+    });
+
+    item.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      item.classList.add("drag-over");
+    });
+
+    item.addEventListener("dragleave", () => {
+      item.classList.remove("drag-over");
+    });
+
+    item.addEventListener("drop", (event) => {
+      event.preventDefault();
+      item.classList.remove("drag-over");
+      const targetSectionKey = item.dataset.sectionKey || "";
+
+      if (
+        !draggedSectionKey ||
+        !targetSectionKey ||
+        draggedSectionKey === targetSectionKey
+      ) {
+        return;
+      }
+
+      const order = sanitizeSectionOrder(state.sectionOrder);
+      const fromIndex = order.indexOf(draggedSectionKey);
+      const toIndex = order.indexOf(targetSectionKey);
+      if (fromIndex < 0 || toIndex < 0) {
+        return;
+      }
+
+      const moved = order.splice(fromIndex, 1)[0];
+      order.splice(toIndex, 0, moved);
+      state.sectionOrder = order;
+      persistState(false);
+      renderSaveFilesPanel();
+      renderPreview();
+    });
+  });
+}
+
+function getPreviewSectionLabel(sectionKey) {
+  if (sectionKey === "summary") {
+    return t("preview.summary");
+  }
+  return t(`preview.${sectionKey}`);
+}
+
+function sanitizeSectionOrder(order) {
+  const seen = new Set();
+  const source = Array.isArray(order) ? order : [];
+  const result = [];
+
+  source.forEach((key) => {
+    const cleaned = clean(key);
+    if (!PREVIEW_SECTION_ORDER_DEFAULT.includes(cleaned) || seen.has(cleaned)) {
+      return;
+    }
+    seen.add(cleaned);
+    result.push(cleaned);
+  });
+
+  PREVIEW_SECTION_ORDER_DEFAULT.forEach((key) => {
+    if (!seen.has(key)) {
+      result.push(key);
+    }
+  });
+
+  return result;
 }
 
 function renderSaveSlotSummary(slotKeys) {
@@ -776,6 +965,7 @@ function applySnapshotToState(snapshot) {
     courses: sanitizeArray(snapshot.courses, emptyCourse),
     trainings: sanitizeArray(snapshot.trainings, emptyTraining),
     aiWorkflow: sanitizeArray(snapshot.aiWorkflow, emptyAiWorkflow),
+    sectionOrder: sanitizeSectionOrder(snapshot.sectionOrder),
     salaryRecords: Array.isArray(snapshot.salaryRecords)
       ? snapshot.salaryRecords
       : [],
@@ -1426,12 +1616,9 @@ function renderPreview() {
     .map(clean)
     .filter(Boolean);
 
-  preview.innerHTML = `
-    <h1 class="resume-name">${esc(clean(personalForPreview.fullName) || t("ph.fullName"))}</h1>
-    ${clean(personalForPreview.professionalTitle) ? `<p class="resume-title">${esc(clean(personalForPreview.professionalTitle))}</p>` : ""}
-    ${contactParts.length ? `<div class="resume-contact">${contactParts.map(esc).join(" | ")}</div>` : ""}
-    ${renderSummaryPreview()}
-    ${renderEntryPreview("education", "preview.education", (item) => ({
+  const sectionHtmlByKey = {
+    summary: renderSummaryPreview(),
+    education: renderEntryPreview("education", "preview.education", (item) => ({
       title: item.school,
       subtitle: [item.degree, item.location]
         .map(clean)
@@ -1439,8 +1626,8 @@ function renderPreview() {
         .join(" | "),
       date: formatDateRange(item.start, item.end),
       details: item.details,
-    }))}
-    ${renderEntryPreview("experience", "preview.experience", (item) => ({
+    })),
+    experience: renderEntryPreview("experience", "preview.experience", (item) => ({
       title: item.company,
       subtitle: [item.role, item.location]
         .map(clean)
@@ -1448,8 +1635,8 @@ function renderPreview() {
         .join(" | "),
       date: formatDateRange(item.start, item.end),
       details: item.details,
-    }))}
-    ${renderEntryPreview("leadership", "preview.leadership", (item) => ({
+    })),
+    leadership: renderEntryPreview("leadership", "preview.leadership", (item) => ({
       title: item.organization,
       subtitle: [item.role, item.location]
         .map(clean)
@@ -1457,17 +1644,28 @@ function renderPreview() {
         .join(" | "),
       date: formatDateRange(item.start, item.end),
       details: item.details,
-    }))}
-    ${renderEntryPreview("projects", "preview.projects", (item) => ({
+    })),
+    projects: renderEntryPreview("projects", "preview.projects", (item) => ({
       title: item.projectName,
       subtitleHtml: formatProjectSubtitle(item),
       date: formatDateRange(item.start, item.end),
       details: item.details,
-    }))}
-    ${renderSkillsPreview()}
-    ${renderDateRowSection("courses", "preview.courses", "issuer")}
-    ${renderDateRowSection("trainings", "preview.trainings", "organizer")}
-    ${renderHonorsSection()}
+    })),
+    skills: renderSkillsPreview(),
+    courses: renderDateRowSection("courses", "preview.courses", "issuer"),
+    trainings: renderDateRowSection("trainings", "preview.trainings", "organizer"),
+    honors: renderHonorsSection(),
+  };
+
+  const orderedSections = sanitizeSectionOrder(state.sectionOrder)
+    .map((sectionKey) => sectionHtmlByKey[sectionKey] || "")
+    .join("");
+
+  preview.innerHTML = `
+    <h1 class="resume-name">${esc(clean(personalForPreview.fullName) || t("ph.fullName"))}</h1>
+    ${clean(personalForPreview.professionalTitle) ? `<p class="resume-title">${esc(clean(personalForPreview.professionalTitle))}</p>` : ""}
+    ${contactParts.length ? `<div class="resume-contact">${contactParts.map(esc).join(" | ")}</div>` : ""}
+    ${orderedSections}
   `;
 }
 
@@ -1959,6 +2157,7 @@ function loadState() {
       courses: sanitizeArray(parsed.courses, emptyCourse),
       trainings: sanitizeArray(parsed.trainings, emptyTraining),
       aiWorkflow: sanitizeArray(parsed.aiWorkflow, emptyAiWorkflow),
+      sectionOrder: sanitizeSectionOrder(parsed.sectionOrder),
       saveSlots:
         parsed.saveSlots && typeof parsed.saveSlots === "object"
           ? parsed.saveSlots
@@ -1967,6 +2166,7 @@ function loadState() {
       salaryRecords: Array.isArray(parsed.salaryRecords)
         ? parsed.salaryRecords
         : [],
+      showSectionOrderControls: false,
     };
   } catch (error) {
     return structuredClone(defaultState);
@@ -1997,6 +2197,8 @@ function getSanitizedStateForSave() {
         ? state.saveSlots
         : {},
     selectedSaveSlot: clean(state.selectedSaveSlot || ""),
+    sectionOrder: sanitizeSectionOrder(state.sectionOrder),
+    showSectionOrderControls: Boolean(state.showSectionOrderControls),
   };
 }
 
@@ -2085,11 +2287,13 @@ async function hydrateResumeFromDatabase() {
       courses: sanitizeArray(remoteState.courses, emptyCourse),
       trainings: sanitizeArray(remoteState.trainings, emptyTraining),
       aiWorkflow: sanitizeArray(remoteState.aiWorkflow, emptyAiWorkflow),
+      sectionOrder: sanitizeSectionOrder(remoteState.sectionOrder),
       saveSlots: remoteState.saveSlots || {},
       selectedSaveSlot: clean(remoteState.selectedSaveSlot || ""),
       salaryRecords: Array.isArray(remoteState.salaryRecords)
         ? remoteState.salaryRecords
         : [],
+      showSectionOrderControls: false,
     };
 
     persistState(false);

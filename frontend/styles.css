@@ -119,6 +119,14 @@ body {
   overflow: auto;
 }
 
+.utility-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
 .panel-header h2,
 .preview-head h2 {
   margin: 0;
@@ -171,16 +179,31 @@ body {
 }
 
 .privacy-box {
-  margin-top: 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 12px;
+  padding: 10px;
   background: #fbfcff;
 }
 
-.privacy-box h3 {
-  margin: 0;
-  font-size: 0.92rem;
+.privacy-collapsible summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.privacy-collapsible summary::-webkit-details-marker {
+  display: none;
+}
+
+.privacy-collapsible summary::after {
+  content: "+";
+  float: right;
+  font-weight: 700;
+}
+
+.privacy-collapsible[open] summary::after {
+  content: "-";
 }
 
 .privacy-box ul {
@@ -192,7 +215,6 @@ body {
 }
 
 .save-files {
-  margin-top: 10px;
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 10px;
@@ -224,7 +246,14 @@ body {
 .save-files-actions {
   margin-top: 8px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.save-files-secondary-actions {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -232,30 +261,104 @@ body {
   margin-top: 7px;
   font-size: 0.77rem;
   color: #5a6f87;
+  line-height: 1.35;
+}
+
+.save-files-layout-toggle-wrap {
+  margin-top: 8px;
+}
+
+.save-files-layout-toggle {
+  width: 100%;
+}
+
+.save-files-order {
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+
+.save-files-order-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #2d4560;
+}
+
+.save-files-order-hint {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  color: #5a6f87;
+}
+
+.section-order-list {
+  margin-top: 8px;
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.section-order-list.active {
+  display: flex;
+}
+
+.section-order-item {
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  background: #fff;
+  color: #28415d;
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: grab;
+}
+
+.section-order-handle {
+  color: #6a7f96;
+  letter-spacing: 0.12em;
+}
+
+.section-order-item.dragging {
+  opacity: 0.6;
+}
+
+.section-order-item.drag-over {
+  border-color: #0a4aad;
+  box-shadow: 0 0 0 2px rgba(10, 74, 173, 0.15);
 }
 
 .form-section {
   border-top: 1px solid var(--line);
-  margin-top: 14px;
-  padding-top: 14px;
+  margin-top: 10px;
+  padding-top: 10px;
 }
 
 .section-tabs,
 .tool-tabs {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
-  margin-top: 14px;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
 }
 
 .section-tab,
 .tool-tab {
+  flex: 0 0 auto;
   border: 1px solid var(--line-strong);
   background: #ffffff;
   color: #27425f;
   border-radius: 999px;
-  min-height: 34px;
-  padding: 0 12px;
+  min-height: 32px;
+  padding: 0 10px;
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
@@ -720,12 +823,27 @@ body.dark-mode .analysis-list,
 body.dark-mode .note,
 body.dark-mode .meter-meta,
 body.dark-mode .save-files-list,
+body.dark-mode .save-files-order-title,
+body.dark-mode .save-files-order-hint,
 body.dark-mode .empty-state,
 body.dark-mode .panel-header p,
 body.dark-mode .preview-head p,
 body.dark-mode .subtitle,
 body.dark-mode .entry-title,
 body.dark-mode .input-wrap label {
+  color: #9fb4cd;
+}
+
+body.dark-mode .privacy-collapsible summary {
+  color: #d7e6f8;
+}
+
+body.dark-mode .section-order-item {
+  background: #16263a;
+  color: var(--ink);
+}
+
+body.dark-mode .section-order-handle {
   color: #9fb4cd;
 }
 
@@ -751,6 +869,56 @@ body.dark-mode .salary-item strong {
 body.dark-mode .resume-preview {
   border-color: #314760;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode,
+body.dark-mode .form-panel,
+body.dark-mode .preview-panel,
+body.dark-mode .section-order-list,
+body.dark-mode .section-tabs,
+body.dark-mode .tool-tabs {
+  scrollbar-color: #3f5f84 #13243a;
+  scrollbar-width: thin;
+}
+
+body.dark-mode::-webkit-scrollbar,
+body.dark-mode .form-panel::-webkit-scrollbar,
+body.dark-mode .preview-panel::-webkit-scrollbar,
+body.dark-mode .section-order-list::-webkit-scrollbar,
+body.dark-mode .section-tabs::-webkit-scrollbar,
+body.dark-mode .tool-tabs::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+body.dark-mode::-webkit-scrollbar-track,
+body.dark-mode .form-panel::-webkit-scrollbar-track,
+body.dark-mode .preview-panel::-webkit-scrollbar-track,
+body.dark-mode .section-order-list::-webkit-scrollbar-track,
+body.dark-mode .section-tabs::-webkit-scrollbar-track,
+body.dark-mode .tool-tabs::-webkit-scrollbar-track {
+  background: #13243a;
+  border-radius: 999px;
+}
+
+body.dark-mode::-webkit-scrollbar-thumb,
+body.dark-mode .form-panel::-webkit-scrollbar-thumb,
+body.dark-mode .preview-panel::-webkit-scrollbar-thumb,
+body.dark-mode .section-order-list::-webkit-scrollbar-thumb,
+body.dark-mode .section-tabs::-webkit-scrollbar-thumb,
+body.dark-mode .tool-tabs::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #4a6f97 0%, #355577 100%);
+  border-radius: 999px;
+  border: 2px solid #13243a;
+}
+
+body.dark-mode::-webkit-scrollbar-thumb:hover,
+body.dark-mode .form-panel::-webkit-scrollbar-thumb:hover,
+body.dark-mode .preview-panel::-webkit-scrollbar-thumb:hover,
+body.dark-mode .section-order-list::-webkit-scrollbar-thumb:hover,
+body.dark-mode .section-tabs::-webkit-scrollbar-thumb:hover,
+body.dark-mode .tool-tabs::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #5e86b1 0%, #436688 100%);
 }
 
 @media (max-width: 1200px) {
@@ -792,8 +960,14 @@ body.dark-mode .resume-preview {
   }
 
   .save-files-row,
-  .save-files-actions {
+  .save-files-actions,
+  .save-files-secondary-actions {
     grid-template-columns: 1fr;
+  }
+
+  .utility-grid {
+    margin-top: 8px;
+    gap: 8px;
   }
 }
 
