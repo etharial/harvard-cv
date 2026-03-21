@@ -36,7 +36,8 @@ const translations = {
     "saveFiles.customizeLayout": "Customize Layout",
     "saveFiles.hideLayout": "Hide Layout Controls",
     "saveFiles.customizeOrder": "CV section order",
-    "saveFiles.dragHint": "Drag sections to customize the Harvard CV paper order.",
+    "saveFiles.dragHint":
+      "Drag sections to customize the Harvard CV paper order.",
     "saveFiles.confirmLoad":
       "Load selected save file? Unsaved edits will be replaced.",
     "saveFiles.confirmDelete": "Delete selected save file?",
@@ -385,7 +386,8 @@ const translations = {
     "saveFiles.customizeLayout": "Ayusin ang Layout",
     "saveFiles.hideLayout": "Itago ang Layout Controls",
     "saveFiles.customizeOrder": "Ayos ng CV sections",
-    "saveFiles.dragHint": "I-drag ang sections para ayusin ang Harvard CV order.",
+    "saveFiles.dragHint":
+      "I-drag ang sections para ayusin ang Harvard CV order.",
     "saveFiles.confirmLoad":
       "I-load ang napiling save file? Mapapalitan ang unsaved changes.",
     "saveFiles.confirmDelete": "Burahin ang napiling save file?",
@@ -1627,24 +1629,32 @@ function renderPreview() {
       date: formatDateRange(item.start, item.end),
       details: item.details,
     })),
-    experience: renderEntryPreview("experience", "preview.experience", (item) => ({
-      title: item.company,
-      subtitle: [item.role, item.location]
-        .map(clean)
-        .filter(Boolean)
-        .join(" | "),
-      date: formatDateRange(item.start, item.end),
-      details: item.details,
-    })),
-    leadership: renderEntryPreview("leadership", "preview.leadership", (item) => ({
-      title: item.organization,
-      subtitle: [item.role, item.location]
-        .map(clean)
-        .filter(Boolean)
-        .join(" | "),
-      date: formatDateRange(item.start, item.end),
-      details: item.details,
-    })),
+    experience: renderEntryPreview(
+      "experience",
+      "preview.experience",
+      (item) => ({
+        title: item.company,
+        subtitle: [item.role, item.location]
+          .map(clean)
+          .filter(Boolean)
+          .join(" | "),
+        date: formatDateRange(item.start, item.end),
+        details: item.details,
+      }),
+    ),
+    leadership: renderEntryPreview(
+      "leadership",
+      "preview.leadership",
+      (item) => ({
+        title: item.organization,
+        subtitle: [item.role, item.location]
+          .map(clean)
+          .filter(Boolean)
+          .join(" | "),
+        date: formatDateRange(item.start, item.end),
+        details: item.details,
+      }),
+    ),
     projects: renderEntryPreview("projects", "preview.projects", (item) => ({
       title: item.projectName,
       subtitleHtml: formatProjectSubtitle(item),
@@ -1653,7 +1663,11 @@ function renderPreview() {
     })),
     skills: renderSkillsPreview(),
     courses: renderDateRowSection("courses", "preview.courses", "issuer"),
-    trainings: renderDateRowSection("trainings", "preview.trainings", "organizer"),
+    trainings: renderDateRowSection(
+      "trainings",
+      "preview.trainings",
+      "organizer",
+    ),
     honors: renderHonorsSection(),
   };
 
