@@ -1815,19 +1815,7 @@ function renderPreview() {
         details: item.details,
       }),
     ),
-    leadership: renderEntryPreview(
-      "leadership",
-      "preview.leadership",
-      (item) => ({
-        title: item.organization,
-        subtitle: [item.role, item.location]
-          .map(clean)
-          .filter(Boolean)
-          .join(" | "),
-        date: formatDateRange(item.start, item.end),
-        details: item.details,
-      }),
-    ),
+    leadership: renderLeadershipPreview(),
     projects: renderEntryPreview("projects", "preview.projects", (item) => ({
       title: item.projectName,
       subtitleHtml: formatProjectSubtitle(item),
@@ -1914,6 +1902,51 @@ function renderEntryPreview(sectionKey, headingKey, mapFn) {
     <section class="resume-section">
       <h3>${t(headingKey)}</h3>
       ${items.map((item) => renderResumeItem(mapFn(item))).join("")}
+    </section>
+  `;
+}
+
+function renderLeadershipPreview() {
+  const items = state.leadership.filter((item) =>
+    Object.values(item).some((value) => clean(value)),
+  );
+
+  if (!items.length) {
+    return "";
+  }
+
+  const mapLeadershipItem = (item) => ({
+    title: item.organization,
+    subtitle: [item.role, item.location].map(clean).filter(Boolean).join(" | "),
+    date: formatDateRange(item.start, item.end),
+    details: item.details,
+  });
+
+  if (items.length <= 3) {
+    return `
+      <section class="resume-section">
+        <h3>${t("preview.leadership")}</h3>
+        ${items.map((item) => renderResumeItem(mapLeadershipItem(item))).join("")}
+      </section>
+    `;
+  }
+
+  const groupedItems = chunkArray(items, 3);
+
+  return `
+    <section class="resume-section">
+      <h3>${t("preview.leadership")}</h3>
+      <div class="resume-multi-column">
+        ${groupedItems
+          .map(
+            (group) => `
+              <div class="resume-column">
+                ${group.map((item) => renderResumeItem(mapLeadershipItem(item))).join("")}
+              </div>
+            `,
+          )
+          .join("")}
+      </div>
     </section>
   `;
 }
@@ -2100,6 +2133,18 @@ function splitByNewline(value) {
 
 function splitByCommaOrNewline(value) {
   return clean(value).split("\n").map(clean).filter(Boolean);
+}
+
+function chunkArray(items, chunkSize) {
+  if (!Array.isArray(items) || chunkSize <= 0) {
+    return [];
+  }
+
+  const chunks = [];
+  for (let index = 0; index < items.length; index += chunkSize) {
+    chunks.push(items.slice(index, index + chunkSize));
+  }
+  return chunks;
 }
 
 function renderResumeItem({ title, subtitle, subtitleHtml, date, details }) {
